@@ -38,6 +38,7 @@ service.interceptors.response.use(
         type: 'success',
         duration: 5 * 1000
       })
+      return response.data
     }
     // 操作成功
     else if (response.status === 204) {
@@ -46,6 +47,7 @@ service.interceptors.response.use(
         type: 'success',
         duration: 5 * 1000
       })
+      return response.data
     }
     else {
       return Promise.reject('error');
