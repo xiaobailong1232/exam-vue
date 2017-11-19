@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Message, MessageBox } from 'element-ui'
+import { Message, MessageBox, Notification } from 'element-ui'
 import store from '../store'
 import { getToken } from '@/utils/auth'
 
@@ -24,42 +24,102 @@ service.interceptors.request.use(config => {
 // respone拦截器
 service.interceptors.response.use(
   response => {
-  /**
-  * code为非20000是抛错 可结合自己业务进行修改
-  */
+    /**
+      * code为非20000是抛错 可结合自己业务进行修改
+      */
     const res = response.data
-    if (res.code !== 20000) {
+    if (response.status === 200) {
+      return response.data
+    }
+    // 创建成功
+    else if (response.status === 201) {
       Message({
-        message: res.data,
-        type: 'error',
+        message: response.message || '创建成功',
+        type: 'success',
         duration: 5 * 1000
       })
-
-      // 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('FedLogOut').then(() => {
-            location.reload()// 为了重新实例化vue-router对象 避免bug
-          })
-        })
-      }
-      return Promise.reject('error')
-    } else {
-      return response.data
+    }
+    // 操作成功
+    else if (response.status === 204) {
+      Message({
+        message: response.message || '操作成功',
+        type: 'success',
+        duration: 5 * 1000
+      })
+    }
+    else {
+      return Promise.reject('error');
     }
   },
   error => {
-    console.log('err' + error)// for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
-    return Promise.reject(error)
+    // 超时的错误
+    if (!error.response) {
+      Notification({
+        title: '服务器连接超时',
+        message: error.message || '出现了一个未预料的错误',
+        type: 'error',
+        duration: 3000
+      });
+      return Promise.reject(error);
+    }
+    // 身份验证
+    if (error.response.status === 401) {
+      Notification({
+        title: '身份验证失效',
+        message: '正在跳转登录页，请重新登录',
+        type: 'error',
+        duration: 1000
+      });
+  
+      store.dispatch('FedLogOut').then(() => {
+        location.reload()// 为了重新实例化vue-router对象 避免bug
+      })
+    }
+    // 权限错误
+    else if (error.response.status === 403) {
+      Notification({
+        title: '禁止',
+        message: error.response.data.message || '超出允许的权限范围',
+        type: 'error',
+        duration: 3000,
+      });
+      return Promise.reject(error);
+    }
+    // 未找到
+    else if (error.response.status === 404) {
+      Notification({
+        title: '未找到',
+        message: error.response.data.message,
+        type: 'error',
+        duration: 3000,
+      });
+      return Promise.reject(error);
+    }
+    // 参数错误
+    else if (error.response.status === 422) {
+      const messages = [...Object.values(error.response.data.errors)];
+      console.log(error.response.message);
+      messages.forEach((item, index) => {
+        Notification({
+          title: error.response.message || '参数错误',
+          message: item.join(''),
+          type: 'error',
+          offset: 80 * index
+        });
+      });
+    
+      return Promise.reject(error);
+    }
+    // 其余错误
+    else {
+      console.log('err' + error);// for debug
+      Notification({
+        title: error.response.status,
+        message: '出现了一个未预料的错误',
+        type: 'error'
+      });
+      return Promise.reject(error);
+    }
   }
 )
 

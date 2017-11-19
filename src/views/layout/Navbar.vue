@@ -1,5 +1,8 @@
 <template>
-  <el-menu class="navbar" mode="horizontal">
+  <el-menu class="navbar" mode="horizontal"
+           background-color="#eef1f6"
+           text-color="#536273"
+           active-text-color="#8a9bb0">
     <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
     <levelbar></levelbar>
     <el-dropdown class="avatar-container" trigger="click">

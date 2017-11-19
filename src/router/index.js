@@ -6,6 +6,8 @@ const _import = require('./_import_' + process.env.NODE_ENV)
 /* layout */
 import Layout from '../views/layout/Layout'
 
+import User from '@/views/user/index'
+
 Vue.use(Router)
 
 /**
@@ -26,27 +28,106 @@ export const constantRouterMap = [
     hidden: true,
     children: [{ path: 'dashboard', component: _import('dashboard/index') }]
   },
-
   {
-    path: '/example',
+    path: '/user',
     component: Layout,
-    redirect: 'noredirect',
-    name: 'Example',
+    redirect: '/user/index',
     icon: 'zujian',
+    noDropdown: true,
     children: [
-      { path: 'index', name: 'Form', icon: 'zonghe', component: _import('page/form') }
+      { path: 'index', name: '用户管理', icon: 'zonghe', component: User }
     ]
   },
-
   {
-    path: '/table',
+    path: '/label',
     component: Layout,
-    redirect: '/table/index',
-    icon: 'tubiao',
+    redirect: 'noredirect',
+    icon: 'zujian',
     noDropdown: true,
-    children: [{ path: 'index', name: 'Table', component: _import('table/index'), meta: { role: ['admin'] }}]
+    children: [
+      { path: 'index', name: '标签管理', icon: 'zonghe', component: _import('label/index') }
+    ]
   },
-
+  {
+    path: '/role',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '角色管理', icon: 'zonghe', component: _import('role/index') }
+    ]
+  },
+  {
+    path: '/menu',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '菜单管理', icon: 'zonghe', component: _import('menu/index') }
+    ]
+  },
+  {
+    path: '/action',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '功能管理', icon: 'zonghe', component: _import('action/index') }
+    ]
+  },
+  {
+    path: '/question',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '题目管理', icon: 'zonghe', component: _import('question/index') }
+    ]
+  },
+  {
+    path: '/exam',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '考试管理', icon: 'zonghe', component: _import('exam/index') }
+    ]
+  },
+  {
+    path: '/paper',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '试卷管理', icon: 'zonghe', component: _import('paper/index') }
+    ]
+  },
+  {
+    path: '/record',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '答题记录', icon: 'zonghe', component: _import('record/index') }
+    ]
+  },
+  {
+    path: '/group',
+    component: Layout,
+    redirect: 'noredirect',
+    icon: 'zujian',
+    noDropdown: true,
+    children: [
+      { path: 'index', name: '群组管理', icon: 'zonghe', component: _import('group/index') }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 
