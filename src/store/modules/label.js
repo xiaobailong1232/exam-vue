@@ -38,7 +38,6 @@ const label = {
     fetchLabelList({ commit }) {
       return new Promise((resolve, reject) => {
         return getLabelListFromApi().then(response => {
-          console.log(response.data)
           commit('SET_LIST', response.data)
           resolve(response)
         }).catch(err => {

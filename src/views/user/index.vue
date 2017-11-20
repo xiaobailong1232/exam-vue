@@ -222,7 +222,7 @@
       initFetch() {
         // 格式化URL参数
         this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1;
-        this.search.size = this.$route.query.limit ? parseInt(this.$route.query.limit) : 10;
+        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10;
         this.search.name = this.$route.query.name ? this.$route.query.name : null;
         this.search.phone = this.$route.query.phone ? this.$route.query.phone : null;
         this.search.is_active = parseInt(this.$route.query.is_active) === 0 || this.$route.query.is_active ? parseInt(this.$route.query.is_active) : null;
@@ -253,7 +253,6 @@
       },
       // 搜索
       handleSearch() {
-        console.log(111);
         this.pushRoute();
       },
       // 开启 或 禁用用户

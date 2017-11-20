@@ -16,7 +16,6 @@ export function getGroupItemFromApi(id) {
 }
 // 创建
 export function addGroupItemToApi(data) {
-  console.log(222);
   return fetch({
     url: '/group',
     method: 'POST',

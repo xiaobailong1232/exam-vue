@@ -5,6 +5,13 @@ const getters = {
   name: state => state.user.name,
   roles: state => state.user.roles,
   roleOptions: state => state.role.list,
-  groupLabelOptions: state => state.label.list.filter(item => item.upid === 1),
+  groupCollegeLabels: state => state.label.list.filter(item => item.upid === 2),
+  groupMajorLabels: state => state.label.list.filter(item => item.upid === 6),
+  groupClassLabels: state => state.label.list.filter(item => item.upid === 10),
+  questionBookLabels: state => state.label.list.filter(item => item.upid === 16),
+  questionChapterLabels: state => state.label.list.filter(item => item.upid === 21),
+  questionSectionLabels: state => state.label.list.filter(item => item.upid === 32),
+  questionKnowledgeLabels: state => state.label.list.filter(item => item.upid === 43),
+  questionStarLabels: state => state.label.list.filter(item => item.upid === 48),
 }
 export default getters

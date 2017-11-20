@@ -1,5 +1,5 @@
 <template>
-  <el-menu mode="vertical" theme="dark"
+  <el-menu mode="vertical"
            background-color="#334157"
            text-color="#a2aebf"
            active-text-color="#21a0ff"

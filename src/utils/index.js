@@ -60,7 +60,7 @@ export function formatTime(time, option) {
 export function filterNullOfObject(obj) {
   let newData = {}
   for (let index in obj) {
-    if ((obj[index] !== undefined && obj[index] !== null) || parseInt(obj[index]) === 0) {
+    if ((obj[index] !== undefined && obj[index] !== null && obj[index].length !== 0) || parseInt(obj[index])) {
       newData[index] = obj[index]
     }
   }
