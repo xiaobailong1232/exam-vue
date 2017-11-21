@@ -31,7 +31,7 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-select v-model="search.section" placeholder="请选择知识点" filterable clearable>
+          <el-select v-model="search.knowledge" placeholder="请选择知识点" filterable clearable>
             <el-option v-for="item in questionKnowledgeLabels" :key="item.id" :label="item.name"
                        :value="item.id"></el-option>
           </el-select>

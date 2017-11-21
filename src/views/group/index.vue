@@ -95,7 +95,7 @@
         <el-form-item label="标签">
           <el-select v-model="label.data.label_id" placeholder="请选择标签" :disabled="!label.status" :loading="labelLoading">
             <el-option
-              v-for="item in groupLabelOptions"
+              v-for="item in groupCollegeLabels"
               :key="item.id"
               :label="item.name"
               :value="item.id">
@@ -135,7 +135,7 @@
       this.initFetch();
     },
     computed: {
-      ...mapGetters(['groupLabelOptions'])
+      ...mapGetters(['groupCollegeLabels', 'groupClassLabels', 'groupMajorLabels'])
     },
     data() {
       return {
@@ -317,7 +317,7 @@
         this.label.row = row;
         this.label.show = true;
         this.label.status = true;
-        if (this.groupLabelOptions.length === 0) {
+        if (this.groupCollegeLabels.length === 0) {
           this.labelLoading = true;
           this.$store.dispatch('fetchLabelList').finally(() => this.labelLoading = false);
         }
