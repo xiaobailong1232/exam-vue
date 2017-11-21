@@ -16,8 +16,6 @@ export function getQuestionListFromApi(params) {
     fields.forEach(item => params.label_id.push(params[item]))
   }
   
-  console.log(params)
- 
   return fetch({
     url: baseUri,
     method: 'GET',

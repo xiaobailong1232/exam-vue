@@ -8,27 +8,32 @@
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.type" placeholder="请选择类型" filterable clearable>
-            <el-option v-for="item in [{id:1, name: '单选'}, {id: 2, name: '多选'}]" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in [{id:1, name: '单选'}, {id: 2, name: '多选'}]" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.book" placeholder="请选择书籍" filterable clearable>
-            <el-option v-for="item in questionBookLabels" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in questionBookLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.chapter" placeholder="请选择章" filterable clearable>
-            <el-option v-for="item in questionChapterLabels" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in questionChapterLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.section" placeholder="请选择节" filterable clearable>
-            <el-option v-for="item in questionSectionLabels" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in questionSectionLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.section" placeholder="请选择知识点" filterable clearable>
-            <el-option v-for="item in questionKnowledgeLabels" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in questionKnowledgeLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -37,7 +42,8 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="handleSearch" @keyup.enter.native="handleSearch"></el-button>
+          <el-button type="primary" icon="el-icon-search" @click="handleSearch"
+                     @keyup.enter.native="handleSearch"></el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -58,18 +64,9 @@
       <el-table-column type="expand">
         <template slot-scope="prop">
           <div>
-            <el-row>
-              <el-col :span="24">
-                <el-button type="primary" size="small" @click="showAddOptionForm(prop.row)" icon="el-icon-plus"></el-button>
-              </el-col>
-            </el-row>
-            
             <el-row v-for="(item,index) in prop.row.options" :key="index" :span="24">
               <el-col>
-                <el-button @click="removeOptionFromQuestion(prop.row, item)" icon="el-icon-delete" type="danger" size="mini" round></el-button>
-                <el-button @click="removeAnswerFromQuestion(prop.row, item)" v-if="item.is_right"  type="warning" icon="el-icon-close" size="mini" round></el-button>
-                <el-button @click="setAnswerToQuestion(prop.row, item)" v-else icon="el-icon-check" type="info" size="mini" round></el-button>
-                <el-tag :type="item.is_right ? 'success' : 'info'">{{ index + 1 }} . {{ item.content }}</el-tag>
+                <el-tag :type="item.is_answer ? 'success' : 'info'">{{ index + 1 }} . {{ item.content }}</el-tag>
               </el-col>
             </el-row>
           </div>
@@ -79,26 +76,33 @@
       <el-table-column prop="title" label="题目名称" width="500"></el-table-column>
       <el-table-column label="类型" width="80">
         <template slot-scope="prop">
-          <el-tag :type="parseInt(prop.row.type) === 1 ? 'info' : 'warning'">{{ parseInt(prop.row.type) === 1 ? '单选' : '多选' }}</el-tag>
+          <el-tag :type="parseInt(prop.row.type) === 1 ? 'info' : 'warning'">
+            {{ parseInt(prop.row.type) === 1 ? '单选' : '多选' }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="属性">
         <template slot-scope="prop">
-          <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable type="primary" @close="removeLabelFromQuestion(prop.row, item)">{{item.name}}</el-tag>
+          <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable
+                  type="primary" @close="removeLabelFromQuestion(prop.row, item)">{{item.name}}
+          </el-tag>
           <el-button size="mini" @click="showAddQuestionLabelForm(prop.row)">+ 标签</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="creator" label="创建人"></el-table-column>
       <el-table-column label="负责人">
         <template slot-scope="prop">
-          <el-button  v-if="prop.row.possessors.length > 0" v-for="item in prop.row.possessors" :key="item.id" size="mini" type="primary">{{ item.possessor }}</el-button>
-          <el-button  v-if="prop.row.possessors.length === 0" size="mini" type="danger">无</el-button>
+          <el-button v-if="prop.row.possessors.length > 0" v-for="item in prop.row.possessors" :key="item.id"
+                     size="mini" type="primary">{{ item.possessor }}
+          </el-button>
+          <el-button v-if="prop.row.possessors.length === 0" size="mini" type="danger">无</el-button>
         </template>
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
           <el-button size="mini" type="info" icon="el-icon-info" @click="showDetailForm(prop.row)"></el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="delteItem(prop.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -117,19 +121,35 @@
     <!-- 分页 end -->
     
     <!-- 弹出层：创建题目 start -->
-    <el-dialog title="创建题目" :visible.sync="form.show" :width="'400px'">
+    <el-dialog title="创建题目" :visible.sync="form.show" width="1000px">
       <el-form :model="form.data" :label-width="'100px'">
         <el-form-item label="题目">
           <el-input v-model="form.data.title" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型">
-          <el-input v-model="form.data.type" auto-complete="off"></el-input>
+          <el-select v-model="form.data.type" placeholder="请选择类型">
+            <el-option v-for="item in questionTypeLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="难度">
-          <el-input v-model="form.data.star" auto-complete="off"></el-input>
+        <el-form-item label="难度星级">
+          <el-select v-model="form.data.star" placeholder="请选择类型">
+            <el-option v-for="item in questionStarLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="答案解析">
           <el-input v-model="form.data.comment" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item v-for="(item, index) in form.data.options" :key="index" :label="'选项' + (index + 1)">
+          <el-input v-model="form.data.options[index].content" auto-complete="off">
+            <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
+                       @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误
+            </el-button>
+            <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
+                       @click="toggleAnswer(form.data.options[index])" v-else>正确
+            </el-button>
+          </el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -143,16 +163,32 @@
     <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
       <el-form :model="edit.data" :label-width="'120px'">
         <el-form-item label="题目">
-          <el-input v-model="edit.data.title" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-input v-model="edit.data.title" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型">
-          <el-input v-model="edit.data.type" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-select v-model="edit.data.type" placeholder="请选择类型">
+            <el-option v-for="item in questionTypeLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="难度">
-          <el-input v-model="edit.data.star" auto-complete="off" :disabled="!edit.status"></el-input>
+        <el-form-item label="难度星级">
+          <el-select v-model="edit.data.star" placeholder="请选择类型">
+            <el-option v-for="item in questionStarLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="答案解析">
-          <el-input v-model="edit.data.comment" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-input v-model="edit.data.comment" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item v-for="(item, index) in edit.data.options" :key="index" :label="'选项' + (index + 1)">
+          <el-input v-model="edit.data.options[index].content" auto-complete="off">
+            <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
+                       @click="toggleAnswer(edit.data.options[index])" v-if="!edit.data.options[index].is_answer">错误
+            </el-button>
+            <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
+                       @click="toggleAnswer(edit.data.options[index])" v-else>正确
+            </el-button>
+          </el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" v-show="edit.status">
@@ -213,7 +249,8 @@
         <el-tab-pane label="知识点">
           <el-row :gutter="50">
             <el-col :span="24">
-              <el-select v-model="label.data.label_id" placeholder="请选择知识点" :loading="labelLoading" filterable clearable>
+              <el-select v-model="label.data.label_id" placeholder="请选择知识点" :loading="labelLoading" filterable
+                         clearable>
                 <el-option
                   v-for="item in questionKnowledgeLabels"
                   :key="item.id"
@@ -228,23 +265,6 @@
       </el-tabs>
     </el-dialog>
     <!-- 弹出层：添加标签 end -->
-  
-    <!-- 弹出层：添加题目选项 start -->
-    <el-dialog title="添加题目选项" :visible.sync="option.show" :width="'400px'">
-      <el-form :model="option.data" :label-width="'100px'">
-        <el-form-item label="内容">
-          <el-input v-model="option.data.content" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="正确答案">
-          <el-switch v-model.number="option.data.is_right" active-color="#13ce66" inactive-color="#ff4949" :active-value="1" active-text="正确" :inactive-value="0"  inactive-text="错误"></el-switch>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="option.show = false">取 消</el-button>
-        <el-button type="primary" @click="addOptionToQuestion" :loading="option.loading">确定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 弹出层：添加题目选项 end -->
   </div>
 </template>
 
@@ -273,10 +293,10 @@
   import { filterNullOfObject } from '@/utils/index';
   
   export default {
-    created () {
+    created() {
       this.initFetch();
       // 读取Labels数据
-      if (this.questionBookLabels.length === 0) {
+      if (this.$store.getters.questionBookLabels.length === 0) {
         this.labelLoading = true;
         this.$store.dispatch('fetchLabelList').finally(() => this.labelLoading = false);
       }
@@ -288,7 +308,10 @@
         'questionChapterLabels',
         'questionSectionLabels',
         'questionKnowledgeLabels',
-        'questionStarLabels'])
+        'questionStarLabels',
+        'questionTypeLabels',
+        'questionStarLabels',
+      ])
     },
     data() {
       return {
@@ -317,6 +340,12 @@
             title: null,// 标题
             type: null,// 类型
             comment: null,// 答案解析
+            options: [
+              {id: 1, content: null, is_answer: 0},
+              {id: 2, content: null, is_answer: 0},
+              {id: 3, content: null, is_answer: 0},
+              {id: 4, content: null, is_answer: 0}
+            ]
           }
         },
         // 详情 与 编辑的属性
@@ -330,6 +359,12 @@
             type: null,// 类型
             comment: null,// 答案解析
             star: null,// 难度
+            options: [
+              {id: 1, content: null, is_answer: 0},
+              {id: 2, content: null, is_answer: 0},
+              {id: 3, content: null, is_answer: 0},
+              {id: 4, content: null, is_answer: 0}
+            ]
           }
         },
         // 题目选项
@@ -341,7 +376,7 @@
           item: null,
           data: {
             content: null,
-            is_right: null
+            is_answer: null,
           }
         },
         // 题目标签
@@ -364,11 +399,11 @@
         this.search.title = this.$route.query.title ? this.$route.query.title : null;
         this.search.star = this.$route.query.star ? Number.parseInt(this.$route.query.star) : null;
         this.search.chapter = this.$route.query.chapter ? Number.parseInt(this.$route.query.chapter) : null,// 章
-        this.search.section = this.$route.query.section ? Number.parseInt(this.$route.query.section) : null,// 节
-        this.search.book = this.$route.query.book ? Number.parseInt(this.$route.query.book) : null,// 书
-        this.search.knowledge = this.$route.query.knowledge ? Number.parseInt(this.$route.query.knowledge) : null,// 知识点
-        this.search.type = this.$route.query.type ? Number.parseInt(this.$route.query.type) : null,// 类型
-        this.loading = true;
+          this.search.section = this.$route.query.section ? Number.parseInt(this.$route.query.section) : null,// 节
+          this.search.book = this.$route.query.book ? Number.parseInt(this.$route.query.book) : null,// 书
+          this.search.knowledge = this.$route.query.knowledge ? Number.parseInt(this.$route.query.knowledge) : null,// 知识点
+          this.search.type = this.$route.query.type ? Number.parseInt(this.$route.query.type) : null,// 类型
+          this.loading = true;
         getQuestionListFromApi(this.search).then(response => {
           this.search.total = Number.parseInt(response.total);
           this.table = response.data
@@ -384,7 +419,7 @@
         });
       },
       // 切换分页大小
-      handleSizeChange (val) {
+      handleSizeChange(val) {
         this.search.size = val;
         this.pushRoute();
       },
@@ -407,6 +442,14 @@
         addQuestionItemToApi(this.form.data).then(response => {
           this.table.unshift(response.data)
           this.form.show = false
+          this.form.data.title = null
+          this.form.data.star = null
+          this.form.data.type = null
+          this.form.data.comment = null
+          this.form.data.options.forEach(item => {
+            item.content = null
+            item.is_answer = 0
+          })
         }).catch(err => console.log(err)).finally(() => this.form.loading = false)
       },
       // 详细信息
@@ -418,6 +461,7 @@
         this.edit.data.type = row.type;
         this.edit.data.star = row.star;
         this.edit.data.comment = row.comment;
+        this.edit.data.options = row.options;
       },
       // 编辑信息
       showEditForm(row) {
@@ -428,19 +472,50 @@
         this.edit.data.type = row.type;
         this.edit.data.star = row.star;
         this.edit.data.comment = row.comment;
+        row.options.forEach((item, index) => {
+          this.edit.data.options[index].content = item.content
+          this.edit.data.options[index].is_answer = item.is_answer
+        });
       },
       // 更新信息
       updateItem() {
         this.edit.loading = true;
-        updateQuestionItemToApi(this.edit.row.id, this.edit.data).then(() => {
-          // 原数据更新
-          this.edit.row.title = this.edit.data.title;
-          this.edit.row.type = this.edit.data.type;
-          this.edit.row.star = this.edit.data.star;
-          this.edit.row.comment = this.edit.data.comment;
+        updateQuestionItemToApi(this.edit.row.id, this.edit.data).then((response) => {
+          // 截取
+          this.table.forEach((item, key) => {
+            if (this.edit.row.id === item.id) {
+              this.table.splice(key, 1, response.data)
+            }
+          })
           // 隐藏表单
           this.edit.show = false;
+          // 原数据更新
+          this.edit.data.title = null;
+          this.edit.data.type = null;
+          this.edit.data.star = null;
+          this.edit.data.comment = null;
+          this.edit.data.options.forEach((item, index) => {
+            this.edit.data.options[index].content = null
+            this.edit.data.options[index].is_answer = 0
+          });
+          
         }).catch(err => console.log(err)).finally(() => this.edit.loading = false);
+      },
+      // 删除
+      delteItem(row) {
+        this.$confirm(`此操作将删除『${row.title}』题目, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        .then(() => deleteQuestionItemToApi(row.id))
+        .then(response => {
+          this.table.forEach((item, key) => {
+            if (item.id === row.id) {
+              this.table.splice(key, 1)
+            }
+          })
+        }).catch(err => console.log(err));
       },
       // 移除标签
       removeLabelFromQuestion(row, item) {
@@ -477,55 +552,9 @@
         this.option.show = true;
         this.option.row = row;
       },
-      // 添加题目选项
-      addOptionToQuestion() {
-        this.option.loading = true
-        addQuestionOptionItemToApi(this.option.row.id, this.option.data).then(response => {
-          this.option.row.options.push(response.data)
-          this.option.show = false
-          this.option.data.content = null;// 清空数据
-          this.option.data.is_right = null;// 清空数据
-        }).catch(err => console.log(err)).finally(() => this.option.loading = false);
-      },
-      // 移除选项
-      removeOptionFromQuestion(row, item) {
-        this.$confirm(`此操作将删除该题目的『${item.content}』选项, 是否继续?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        .then(() => deleteQuestionOptionItemToApi(row.id, item.id))
-        .then(response => {
-          row.options.forEach((val, key) => {
-            if (val.id === item.id) {
-              row.options.splice(key, 1)
-            }
-          })
-        }).catch(err => console.log(err));
-      },
-      // 设为正确答案
-      setAnswerToQuestion(row, item) {
-        this.$confirm(`此操作将该题目的『${item.content}』选项设为正确答案, 是否继续?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        .then(() => updateQuestionOptionItemToApi(row.id, item.id, {is_right: 1}))
-        .then(response => {
-          item.is_right = 1;
-        }).catch(err => console.log(err));
-      },
-      // 移除正确答案
-      removeAnswerFromQuestion(row, item) {
-        this.$confirm(`此操作将该题目的『${item.content}』选项设为错误答案, 是否继续?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        .then(() => updateQuestionOptionItemToApi(row.id, item.id, {is_right: 0}))
-        .then(response => {
-          item.is_right = 0;
-        }).catch(err => console.log(err));
+      // 转换题目正确与错误
+      toggleAnswer(item) {
+        item.is_answer === 0 ? item.is_answer = 1 : item.is_answer = 0
       }
     }
   }
@@ -534,5 +563,9 @@
 <style>
   .el-row {
     margin-bottom: 10px;
+  }
+  
+  .input-with-select .el-input-group__prepend {
+    background-color: #fff;
   }
 </style>
