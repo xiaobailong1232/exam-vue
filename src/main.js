@@ -9,6 +9,13 @@ import store from './store'
 import '@/icons' // icon
 import '@/permission' // 权限
 
+Array.prototype.contains = function ( needle ) {
+  for (let i in this) {
+    if (this[i] == needle) return true;
+  }
+  return false;
+}
+
 Vue.use(ElementUI)
 locale.use(lang)
 
