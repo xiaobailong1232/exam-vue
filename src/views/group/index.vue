@@ -57,6 +57,9 @@
       <el-table-column label="操作" witdh="100">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          <el-tooltip class="item" effect="dark" content="显示注册二维码" placement="top">
+            <el-button size="mini" type="success" icon="el-icon-plus" @click="showQrcode(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -350,6 +353,10 @@
           row.deleted_at = false
         }).catch(err => console.log(err))
       },
+      // 展示二维码
+      showQrcode(row) {
+        console.log(row)
+      }
     }
   }
 </script>
