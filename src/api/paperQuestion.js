@@ -27,7 +27,9 @@ export function addPaperQuestionItemToApi(paperId, data) {
   return fetch({
     url: baseUriWithLine + paperId + sonUri,
     method: 'POST',
-    data
+    data: {
+      questions: data
+    }
   })
 }
 

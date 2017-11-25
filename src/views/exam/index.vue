@@ -25,14 +25,26 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="50px"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
-      <el-table-column prop="creator" label="创建人"></el-table-column></el-table-column>
-      <el-table-column prop="paper_id" label="试卷"></el-table-column></el-table-column>
-      <el-table-column prop="group_id" label="群组"></el-table-column></el-table-column>
-      <el-table-column prop="created_at" label="创建时间"></el-table-column></el-table-column>
-      <el-table-column prop="started_at" label="预计开始时间"></el-table-column></el-table-column>
-      <el-table-column prop="stopped_at" label="预计结束时间"></el-table-column></el-table-column>
+      <el-table-column label="创建人">
+        <template slot-scope="prop">
+          <el-tag>{{ prop.row.user.name }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="试卷">
+        <template slot-scope="prop">
+          <el-button size="mini" @click="goToPaper(prop.row.id, prop.row.paper.id)">{{ prop.row.paper.name }}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="群组">
+        <template slot-scope="prop">
+          <el-button size="mini">{{ prop.row.group.name }}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column prop="created_at" label="创建时间"></el-table-column>
+      <el-table-column prop="started_at" label="开考时间"></el-table-column>
+      <el-table-column prop="stopped_at" label="结考时间"></el-table-column>
+      
       <el-table-column label="操作">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
@@ -114,20 +126,22 @@
     getExamListFromApi,
     addExamItemToApi,
     updateExamItemToApi,
-    deleteExamItemToApi,
-    restoreExamItemToApi,
-  } from '@/api/exam';
+    deleteExamItemToApi
+  } from '@/api/exam'
   
-  import { mapGetters } from 'vuex';
+  import {
+    getPaperItemFromApi
+  } from '@/api/paper'
   
-  import { filterNullOfObject } from '@/utils/index';
+  import {
+    getGroupItemFromApi
+  } from '@/api/group'
+  
+  import { filterNullOfObject } from '@/utils/index'
   
   export default {
-    created () {
-      this.initFetch();
-    },
-    computed: {
-    
+    created() {
+      this.initFetch()
     },
     data() {
       return {
@@ -140,7 +154,7 @@
           total: 0,
           name: null
         },
-        labelLoading: false,// 获取标签时的啊loading状态
+        labelLoading: false, // 获取标签时的啊loading状态
         // 创建考试
         form: {
           show: false,
@@ -155,10 +169,10 @@
         },
         // 详情 与 编辑的属性
         edit: {
-          show: false,// 当false时，不显示。当true是，显示。
-          status: false,// 当false时，显示详情表单。当true是，显示编辑表单。
+          show: false, // 当false时，不显示。当true是，显示。
+          status: false, // 当false时，显示详情表单。当true是，显示编辑表单。
           loading: false,
-          row: null,// 保存考试信息
+          row: null, // 保存考试信息
           data: {
             name: null,
             paper_id: null,
@@ -173,41 +187,41 @@
       // 进入页面即读取数据
       initFetch() {
         // 格式化URL参数
-        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1;
-        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10;
-        this.search.name = this.$route.query.name ? this.$route.query.name : null;
-        this.loading = true;
+        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1
+        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10
+        this.search.name = this.$route.query.name ? this.$route.query.name : null
+        this.loading = true
         getExamListFromApi(this.search).then(response => {
-          this.search.total = Number.parseInt(response.total);
+          this.search.total = Number.parseInt(response.total)
           this.table = response.data
-        }).catch(err => console.log(err)).finally(() => this.loading = false);
+        }).catch(err => console.log(err)).finally(() => this.loading = false)
       },
       // 推入历史记录
       pushRoute() {
         // 过滤无用参数，否则会报错
-        const query = filterNullOfObject(this.search);
+        const query = filterNullOfObject(this.search)
         this.$router.push({
           path: this.$route.path,
           query: query
         });
       },
       // 切换分页大小
-      handleSizeChange (val) {
-        this.search.size = val;
-        this.pushRoute();
+      handleSizeChange(val) {
+        this.search.size = val
+        this.pushRoute()
       },
       // 当前页切换
       handleCurrentChange(val) {
-        this.search.page = val;
-        this.pushRoute();
+        this.search.page = val
+        this.pushRoute()
       },
       // 搜索
       handleSearch() {
-        this.pushRoute();
+        this.pushRoute()
       },
       // 创建考试
       showAddForm() {
-        this.form.show = true;
+        this.form.show = true
       },
       // 添加考试
       addItem() {
@@ -219,29 +233,29 @@
       },
       // 详细信息
       showDetailForm(row) {
-        this.edit.status = false;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.name = row.name;
-        this.edit.data.paper_id = row.paper_id;
-        this.edit.data.group_id = row.group_id;
-        this.edit.data.started_at = row.started_at;
-        this.edit.data.stopped_at = row.stopped_at;
+        this.edit.status = false
+        this.edit.show = true
+        this.edit.row = row
+        this.edit.data.name = row.name
+        this.edit.data.paper_id = row.paper_id
+        this.edit.data.group_id = row.group_id
+        this.edit.data.started_at = row.started_at
+        this.edit.data.stopped_at = row.stopped_at
       },
       // 编辑信息
       showEditForm(row) {
-        this.edit.status = true;
-        this.edit.show = true;
-        this.edit.row = row;
+        this.edit.status = true
+        this.edit.show = true
+        this.edit.row = row
         this.edit.data.name = row.name
-        this.edit.data.paper_id = row.paper_id;
-        this.edit.data.group_id = row.group_id;
-        this.edit.data.started_at = row.started_at;
-        this.edit.data.stopped_at = row.stopped_at;
+        this.edit.data.paper_id = row.paper_id
+        this.edit.data.group_id = row.group_id
+        this.edit.data.started_at = row.started_at
+        this.edit.data.stopped_at = row.stopped_at
       },
       // 更新信息
       updateItem() {
-        this.edit.loading = true;
+        this.edit.loading = true
         updateExamItemToApi(this.edit.row.id, this.edit.data).then(() => {
           // 原数据更新
           this.edit.row.name = this.edit.data.name
@@ -249,8 +263,8 @@
           this.edit.data.name = null
           this.edit.data.comment = null
           // 隐藏表单
-          this.edit.show = false;
-        }).catch(err => console.log(err)).finally(() => this.edit.loading = false);
+          this.edit.show = false
+        }).catch(err => console.log(err)).finally(() => this.edit.loading = false)
       },
       // 删除
       deleteItem(row) {
@@ -258,16 +272,22 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        })
-        .then(() => deleteExamItemToApi(row.id))
-        .then(response => {
+        }).then(() => deleteExamItemToApi(row.id)).then(response => {
           this.table.forEach((item, key) => {
             if (item.id === row.id) {
               this.table.splice(key, 1)
             }
           })
-        }).catch(err => console.log(err));
+        }).catch(err => console.log(err))
       },
+      // Go To Paper
+      goToPaper(exmaId, paperId) {
+        this.$router.push({ name: '考试试卷', params: { examId: exmaId, paperId: paperId}})
+      },
+      // Go To Group
+      goToGroup(exmaId, groupId) {
+        this.$router.push({ name: '考试群组', params: { examId: exmaId, paperId: groupId}})
+      }
     }
   }
 </script>
