@@ -103,13 +103,9 @@
           </el-table-column>
           <el-table-column label="属性">
             <template slot-scope="prop">
-              <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable
-                      type="primary" @close="removeLabelFromQuestion(prop.row, item)">{{item.name}}
-              </el-tag>
-              <el-button size="mini" @click="showAddQuestionLabelForm(prop.row)">+ 标签</el-button>
+              <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" type="primary">{{item.name}}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="creator" label="创建人"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="prop">
               <el-button size="mini" type="danger" @click="removeQuestionFromPaper(prop.row.id)" v-if="isSelected(prop.row.id)">从试卷移除</el-button>
@@ -262,7 +258,7 @@
         this.$prompt('请输入分数', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          inputPattern: /\d{1,3}/,
+          inputPattern: /^\d{1,3}$/,
           inputErrorMessage: '分数格式为数值'
         }).then(({ value }) => {
           row.score = Number.parseInt(value)

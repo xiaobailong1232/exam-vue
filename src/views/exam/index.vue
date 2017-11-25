@@ -26,14 +26,9 @@
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
       <el-table-column prop="name" label="名称"></el-table-column>
-      <el-table-column label="创建人">
-        <template slot-scope="prop">
-          <el-tag>{{ prop.row.user.name }}</el-tag>
-        </template>
-      </el-table-column>
       <el-table-column label="试卷">
         <template slot-scope="prop">
-          <el-button size="mini" @click="goToPaper(prop.row.id, prop.row.paper.id)">{{ prop.row.paper.name }}</el-button>
+          <el-button size="mini" @click="goToPaper(prop.row.paper.id)">{{ prop.row.paper.name }}</el-button>
         </template>
       </el-table-column>
       <el-table-column label="群组">
@@ -281,8 +276,8 @@
         }).catch(err => console.log(err))
       },
       // Go To Paper
-      goToPaper(exmaId, paperId) {
-        this.$router.push({ name: '考试试卷', params: { examId: exmaId, paperId: paperId}})
+      goToPaper(paperId) {
+        this.$router.push({ name: '试卷题目详情', params: { paperId}})
       },
       // Go To Group
       goToGroup(exmaId, groupId) {

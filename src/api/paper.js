@@ -45,3 +45,11 @@ export function deletePaperItemToApi(id) {
     method: 'DELETE'
   })
 }
+
+// 删除
+export function restorePaperItemToApi(id) {
+  return fetch({
+    url: baseUriWithLine + id + '/restore',
+    method: 'PATCH'
+  })
+}

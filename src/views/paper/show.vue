@@ -3,7 +3,8 @@
     <el-card class="box-card" v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading">
       <div slot="header" class="clearfix">
         <span style="font-size: 18px;font-weight: bold">试卷：{{ paper.name }}</span>
-        <el-button style="font-size: 18px;float: right; padding: 3px 0" type="text" @click="goToEdit">我要修改</el-button>
+        <el-button style="color: #FA5555;font-size: 18px;float: right; padding: 3px 0" type="text" v-if="paper.deleted_at" :disabled="true">该试卷已禁用</el-button>
+        <el-button style="font-size: 18px;float: right; padding: 3px 0" type="text" @click="goToEdit" v-else>我要修改</el-button>
       </div>
       
       <el-row v-for="(question, index) in paper.questions" :key="index">

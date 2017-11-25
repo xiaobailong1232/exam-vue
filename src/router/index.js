@@ -96,7 +96,6 @@ export const constantRouterMap = [
     noDropdown: true,
     children: [
       { path: 'index', name: '考试管理', icon: 'zonghe', component: _import('exam/index') },
-      { path: ':examId/group/:groupId', name: '考试群组', component: _import('group/show') },
       { path: ':examId/paper/:paperId', name: '考试试卷', component: _import('paper/show') }
     ]
   },
@@ -108,7 +107,8 @@ export const constantRouterMap = [
     noDropdown: true,
     children: [
       { path: 'index', name: '试卷管理', icon: 'zonghe', component: _import('paper/index') },
-      { path: ':paperId/edit', name: '试卷题目修改', component: _import('paper/edit') }
+      { path: ':paperId/edit', name: '试卷题目修改', component: _import('paper/edit') },
+      { path: ':paperId/show', name: '试卷题目详情', component: _import('paper/show') }
     ]
   },
   {
@@ -128,7 +128,8 @@ export const constantRouterMap = [
     icon: 'zujian',
     noDropdown: true,
     children: [
-      { path: 'index', name: '群组管理', icon: 'zonghe', component: _import('group/index') }
+      { path: 'index', name: '群组管理', icon: 'zonghe', component: _import('group/index') },
+      { path: ':groupId/member', name: '群组成员', component: _import('group/member') }
     ]
   },
   { path: '*', redirect: '/404', hidden: true }

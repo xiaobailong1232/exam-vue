@@ -25,16 +25,18 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="180"></el-table-column>
       <el-table-column prop="name" label="名称" width="180"></el-table-column>
-      <el-table-column prop="creator" label="创建人"></el-table-column>
-      <el-table-column label="负责人">
+      <el-table-column label="创建人">
         <template slot-scope="prop">
-          <el-button  v-if="prop.row.possessors.length > 0" v-for="item in prop.row.possessors" :key="item.id" size="mini" type="primary" @click="toggleActive(prop.row)">{{ item.possessor }}</el-button>
-          <el-button  v-else type="danger">无</el-button>
+          {{ prop.row.user.name }}
         </template>
       </el-table-column>
-      <el-table-column label="标签">
+      <el-table-column label="成员" width="100">
+        <template slot-scope="prop">
+          <el-button size="mini" @click="goToMembers(prop.row.id)" :type="prop.row.members_count ? 'success' : 'warning'">{{ prop.row.members_count }}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="属性">
         <template slot-scope="prop">
           <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable type="primary" @close="removeLabelFromGroup(prop.row, item)">{{item.name}}</el-tag>
           <el-button size="mini" @click="showAddGroupLabelForm(prop.row)">+ 标签</el-button>
@@ -329,6 +331,10 @@
           this.label.row.labels.push(response.data)
           this.label.show = false
         }).catch(err => console.log(err)).finally(() => this.label.loading = false);
+      },
+      // 查看成员
+      goToMembers(groupId) {
+        this.$router.push({ name: '群组成员', params: { groupId }})
       }
     }
   }
