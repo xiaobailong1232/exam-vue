@@ -286,19 +286,21 @@
     addQuestionOptionItemToApi,
     deleteQuestionOptionItemToApi,
     updateQuestionOptionItemToApi,
-  } from '@/api/questionOption';
+  } from '@/api/questionOption'
   
-  import { mapGetters } from 'vuex';
+  import { mapGetters } from 'vuex'
   
-  import { filterNullOfObject } from '@/utils/index';
+  import { filterNullOfObject } from '@/utils/index'
   
   export default {
     created() {
-      this.initFetch();
+      this.initFetch()
       // 读取Labels数据
       if (this.$store.getters.questionBookLabels.length === 0) {
-        this.labelLoading = true;
-        this.$store.dispatch('fetchLabelList').finally(() => this.labelLoading = false);
+        this.labelLoading = true
+        this.$store.dispatch('fetchLabelList').finally(() => {
+          this.labelLoading = false
+        })
       }
     },
     computed: {
@@ -330,40 +332,40 @@
           start: null,
           type: null
         },
-        labelLoading: false,// 获取标签时的loading状态
-        tabPosition: '0',// 添加标签时的Tab标签页
+        labelLoading: false, // 获取标签时的loading状态
+        tabPosition: '0', // 添加标签时的Tab标签页
         // 创建题目
         form: {
           show: false,
           loading: false,
           data: {
-            title: null,// 标题
-            type: null,// 类型
-            comment: null,// 答案解析
+            title: null, // 标题
+            type: null, // 类型
+            comment: null, // 答案解析
             options: [
-              {id: 1, content: null, is_answer: 0},
-              {id: 2, content: null, is_answer: 0},
-              {id: 3, content: null, is_answer: 0},
-              {id: 4, content: null, is_answer: 0}
+              { id: 1, content: null, is_answer: 0 },
+              { id: 2, content: null, is_answer: 0 },
+              { id: 3, content: null, is_answer: 0 },
+              { id: 4, content: null, is_answer: 0 }
             ]
           }
         },
         // 详情 与 编辑的属性
         edit: {
-          show: false,// 当false时，不显示。当true是，显示。
-          status: false,// 当false时，显示详情表单。当true是，显示编辑表单。
+          show: false, // 当false时，不显示。当true是，显示。
+          status: false, // 当false时，显示详情表单。当true是，显示编辑表单。
           loading: false,
-          row: null,// 保存题目信息
+          row: null, // 保存题目信息
           data: {
-            title: null,// 标题
-            type: null,// 类型
-            comment: null,// 答案解析
-            star: null,// 难度
+            title: null, // 标题
+            type: null, // 类型
+            comment: null, // 答案解析
+            star: null, // 难度
             options: [
-              {id: 1, content: null, is_answer: 0},
-              {id: 2, content: null, is_answer: 0},
-              {id: 3, content: null, is_answer: 0},
-              {id: 4, content: null, is_answer: 0}
+              { id: 1, content: null, is_answer: 0 },
+              { id: 2, content: null, is_answer: 0 },
+              { id: 3, content: null, is_answer: 0 },
+              { id: 4, content: null, is_answer: 0 }
             ]
           }
         },
@@ -376,14 +378,14 @@
           item: null,
           data: {
             content: null,
-            is_answer: null,
+            is_answer: null
           }
         },
         // 题目标签
         label: {
-          show: false,// 当false时，不显示。当true是，显示。
+          show: false, // 当false时，不显示。当true是，显示。
           loading: false,
-          row: null,// 保存题目信息
+          row: null, // 保存题目信息
           data: {
             label_id: null
           }
@@ -394,47 +396,49 @@
       // 进入页面即读取数据
       initFetch() {
         // 格式化URL参数
-        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1;
-        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10;
-        this.search.title = this.$route.query.title ? this.$route.query.title : null;
-        this.search.star = this.$route.query.star ? Number.parseInt(this.$route.query.star) : null;
-        this.search.chapter = this.$route.query.chapter ? Number.parseInt(this.$route.query.chapter) : null,// 章
-          this.search.section = this.$route.query.section ? Number.parseInt(this.$route.query.section) : null,// 节
-          this.search.book = this.$route.query.book ? Number.parseInt(this.$route.query.book) : null,// 书
-          this.search.knowledge = this.$route.query.knowledge ? Number.parseInt(this.$route.query.knowledge) : null,// 知识点
-          this.search.type = this.$route.query.type ? Number.parseInt(this.$route.query.type) : null,// 类型
-          this.loading = true;
+        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1
+        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10
+        this.search.title = this.$route.query.title ? this.$route.query.title : null
+        this.search.star = this.$route.query.star ? Number.parseInt(this.$route.query.star) : null
+        this.search.chapter = this.$route.query.chapter ? Number.parseInt(this.$route.query.chapter) : null // 章
+        this.search.section = this.$route.query.section ? Number.parseInt(this.$route.query.section) : null // 节
+        this.search.book = this.$route.query.book ? Number.parseInt(this.$route.query.book) : null // 书
+        this.search.knowledge = this.$route.query.knowledge ? Number.parseInt(this.$route.query.knowledge) : null // 知识点
+        this.search.type = this.$route.query.type ? Number.parseInt(this.$route.query.type) : null // 类型
+        this.loading = true
         getQuestionListFromApi(this.search).then(response => {
-          this.search.total = Number.parseInt(response.total);
+          this.search.total = Number.parseInt(response.total)
           this.table = response.data
-        }).catch(err => console.log(err)).finally(() => this.loading = false);
+        }).catch(err => console.log(err)).finally(() => {
+          this.loading = false
+        })
       },
       // 推入历史记录
       pushRoute() {
         // 过滤无用参数，否则会报错
-        const query = filterNullOfObject(this.search);
+        const query = filterNullOfObject(this.search)
         this.$router.push({
           path: this.$route.path,
           query: query
-        });
+        })
       },
       // 切换分页大小
       handleSizeChange(val) {
-        this.search.size = val;
-        this.pushRoute();
+        this.search.size = val
+        this.pushRoute()
       },
       // 当前页切换
       handleCurrentChange(val) {
-        this.search.page = val;
-        this.pushRoute();
+        this.search.page = val
+        this.pushRoute()
       },
       // 搜索
       handleSearch() {
-        this.pushRoute();
+        this.pushRoute()
       },
       // 展示创建题目
       showAddForm() {
-        this.form.show = true;
+        this.form.show = true
       },
       // 添加题目
       addItem() {
@@ -454,32 +458,32 @@
       },
       // 详细信息
       showDetailForm(row) {
-        this.edit.status = false;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.title = row.title;
-        this.edit.data.type = row.type;
-        this.edit.data.star = row.star;
-        this.edit.data.comment = row.comment;
-        this.edit.data.options = row.options;
+        this.edit.status = false
+        this.edit.show = true
+        this.edit.row = row
+        this.edit.data.title = row.title
+        this.edit.data.type = row.type
+        this.edit.data.star = row.star
+        this.edit.data.comment = row.comment
+        this.edit.data.options = row.options
       },
       // 编辑信息
       showEditForm(row) {
-        this.edit.status = true;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.title = row.title;
-        this.edit.data.type = row.type;
-        this.edit.data.star = row.star;
-        this.edit.data.comment = row.comment;
+        this.edit.status = true
+        this.edit.show = true
+        this.edit.row = row
+        this.edit.data.title = row.title
+        this.edit.data.type = row.type
+        this.edit.data.star = row.star
+        this.edit.data.comment = row.comment
         row.options.forEach((item, index) => {
           this.edit.data.options[index].content = item.content
           this.edit.data.options[index].is_answer = item.is_answer
-        });
+        })
       },
       // 更新信息
       updateItem() {
-        this.edit.loading = true;
+        this.edit.loading = true
         updateQuestionItemToApi(this.edit.row.id, this.edit.data).then((response) => {
           // 截取
           this.table.forEach((item, key) => {
@@ -488,12 +492,12 @@
             }
           })
           // 隐藏表单
-          this.edit.show = false;
+          this.edit.show = false
           // 原数据更新
-          this.edit.data.title = null;
-          this.edit.data.type = null;
-          this.edit.data.star = null;
-          this.edit.data.comment = null;
+          this.edit.data.title = null
+          this.edit.data.type = null
+          this.edit.data.star = null
+          this.edit.data.comment = null
           this.edit.data.options.forEach((item, index) => {
             this.edit.data.options[index].content = null
             this.edit.data.options[index].is_answer = 0
@@ -535,8 +539,8 @@
       },
       // 展示添加题目标签表单
       showAddQuestionLabelForm(row) {
-        this.label.row = row;
-        this.label.show = true;
+        this.label.row = row
+        this.label.show = true
       },
       // 添加题目标签
       addLabelToQuestion() {
@@ -549,8 +553,8 @@
       },
       // 展示添加题目选项表单
       showAddOptionForm(row) {
-        this.option.show = true;
-        this.option.row = row;
+        this.option.show = true
+        this.option.row = row
       },
       // 转换题目正确与错误
       toggleAnswer(item) {

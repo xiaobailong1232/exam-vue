@@ -42,10 +42,21 @@
           <el-button size="mini" @click="showAddGroupLabelForm(prop.row)">+ 标签</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      
+      <el-table-column label="状态" width="100">
         <template slot-scope="prop">
-          <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
-          <el-button size="mini" type="info" icon="el-icon-info" @click="showDetailForm(prop.row)"></el-button>
+          <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
+            <el-button size="mini" type="danger" icon="el-icon-error" @click="restoreItem(prop.row)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
+            <el-button size="mini" type="success" icon="el-icon-success" @click="deleteItem(prop.row)"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      
+      <el-table-column label="操作" witdh="100">
+        <template slot-scope="prop">
+          <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -94,10 +105,32 @@
     <!-- 弹出层：添加标签 start -->
     <el-dialog :title="label.status ? '编辑' : '详情'" :visible.sync="label.show">
       <el-form :model="label.data" :label-width="'120px'">
-        <el-form-item label="标签">
-          <el-select v-model="label.data.label_id" placeholder="请选择标签" :disabled="!label.status" :loading="labelLoading">
+        <el-form-item label="大学">
+          <el-select v-model="label.data.college" clearable filterable placeholder="请选择大学" :disabled="!label.status" :loading="labelLoading">
             <el-option
               v-for="item in groupCollegeLabels"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item label="专业">
+          <el-select v-model="label.data.major" clearable filterable placeholder="请选择专业" :disabled="!label.status" :loading="labelLoading">
+            <el-option
+              v-for="item in groupMajorLabels"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item label="班级">
+          <el-select v-model="label.data.class" clearable filterable placeholder="请选择班级" :disabled="!label.status" :loading="labelLoading">
+            <el-option
+              v-for="item in groupClassLabels"
               :key="item.id"
               :label="item.name"
               :value="item.id">
@@ -121,20 +154,27 @@
     updateGroupItemToApi,
     deleteGroupItemToApi,
     restoreGroupItemToApi,
-  } from '@/api/group';
+  } from '@/api/group'
   
   import {
     addGroupLabelItemToApi,
-    deleteGroupLabelItemToApi,
-  } from '@/api/groupLabel';
+    deleteGroupLabelItemToApi
+  } from '@/api/groupLabel'
   
-  import { mapGetters } from 'vuex';
+  import { mapGetters } from 'vuex'
   
-  import { filterNullOfObject } from '@/utils/index';
+  import { filterNullOfObject } from '@/utils/index'
   
   export default {
-    created () {
-      this.initFetch();
+    created() {
+      this.initFetch()
+      // 读取Label标签
+      if (this.groupCollegeLabels.length === 0) {
+        this.labelLoading = true
+        this.$store.dispatch('fetchLabelList').finally(() => {
+          this.labelLoading = false
+        })
+      }
     },
     computed: {
       ...mapGetters(['groupCollegeLabels', 'groupClassLabels', 'groupMajorLabels'])
@@ -151,7 +191,7 @@
           name: null,
           delted_at: null
         },
-        labelLoading: false,// 获取标签时的啊loading状态
+        labelLoading: false, // 获取标签时的啊loading状态
         // 创建群组
         form: {
           show: false,
@@ -162,22 +202,24 @@
         },
         // 详情 与 编辑的属性
         edit: {
-          show: false,// 当false时，不显示。当true是，显示。
-          status: false,// 当false时，显示详情表单。当true是，显示编辑表单。
+          show: false, // 当false时，不显示。当true是，显示。
+          status: false, // 当false时，显示详情表单。当true是，显示编辑表单。
           loading: false,
-          row: null,// 保存群组信息
+          row: null, // 保存群组信息
           data: {
             name: null
           }
         },
         // 群组标签
         label: {
-          show: false,// 当false时，不显示。当true是，显示。
-          status: false,// 当false时，显示详情表单。当true是，显示编辑表单。
+          show: false, // 当false时，不显示。当true是，显示。
+          status: false, // 当false时，显示详情表单。当true是，显示编辑表单。
           loading: false,
-          row: null,// 保存群组信息
+          row: null, // 保存群组信息
           data: {
-            label_id: null
+            college: null,
+            major: null,
+            class: null
           }
         }
       }
@@ -186,67 +228,45 @@
       // 进入页面即读取数据
       initFetch() {
         // 格式化URL参数
-        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1;
-        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10;
-        this.search.name = this.$route.query.name ? this.$route.query.name : null;
-        this.search.phone = this.$route.query.phone ? this.$route.query.phone : null;
-        this.search.is_active = parseInt(this.$route.query.is_active) === 0 || this.$route.query.is_active ? parseInt(this.$route.query.is_active) : null;
-        this.loading = true;
+        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1
+        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10
+        this.search.name = this.$route.query.name ? this.$route.query.name : null
+        this.search.phone = this.$route.query.phone ? this.$route.query.phone : null
+        this.search.is_active = parseInt(this.$route.query.is_active) === 0 || this.$route.query.is_active ? parseInt(this.$route.query.is_active) : null
+        this.loading = true
         getGroupListFromApi(this.search).then(response => {
-          this.search.total = Number.parseInt(response.total);
+          this.search.total = Number.parseInt(response.total)
           this.table = response.data
-        }).catch(err => console.log(err)).finally(() => this.loading = false);
+        }).catch(err => console.log(err)).finally(() => {
+          this.loading = false
+        })
       },
       // 推入历史记录
       pushRoute() {
         // 过滤无用参数，否则会报错
-        const query = filterNullOfObject(this.search);
+        const query = filterNullOfObject(this.search)
         this.$router.push({
           path: this.$route.path,
           query: query
-        });
+        })
       },
       // 切换分页大小
-      handleSizeChange (val) {
-        this.search.size = val;
-        this.pushRoute();
+      handleSizeChange(val) {
+        this.search.size = val
+        this.pushRoute()
       },
       // 当前页切换
       handleCurrentChange(val) {
-        this.search.page = val;
-        this.pushRoute();
+        this.search.page = val
+        this.pushRoute()
       },
       // 搜索
       handleSearch() {
-        this.pushRoute();
-      },
-      // 开启 或 禁用群组
-      toggleActive(row) {
-        // 禁用群组
-        if (row.is_active) {
-          this.$confirm('此操作将禁用群组, 是否继续?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-          .then(() => deleteGroupItemToApi(row.id))
-          .then(response => row.is_active = 0)
-          .catch(err => console.log(err));
-        }
-        // 启用群组
-        else {
-          this.$confirm('此操作将启用群组, 是否继续?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-          .then(() => restoreGroupItemToApi(row.id))
-          .then(response => row.is_active = 1).catch(err => console.log(err));
-        }
+        this.pushRoute()
       },
       // 创建群组
       showAddForm() {
-        this.form.show = true;
+        this.form.show = true
       },
       // 添加群组
       addItem() {
@@ -256,47 +276,26 @@
           this.form.show = false
         }).catch(err => console.log(err)).finally(() => this.form.loading = false)
       },
-      // 详细信息
-      showDetailForm(row) {
-        this.edit.status = false;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.name = row.name;
-        this.edit.data.email = row.email;
-        this.edit.data.phone = row.phone;
-      },
       // 编辑信息
       showEditForm(row) {
-        this.edit.status = true;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.name = row.name;
-        this.edit.data.email = row.email;
-        this.edit.data.phone = row.phone;
+        this.edit.status = true
+        this.edit.show = true
+        this.edit.row = row
+        this.edit.data.name = row.name
+        this.edit.data.email = row.email
+        this.edit.data.phone = row.phone
       },
       // 更新信息
       updateItem() {
-        this.edit.loading = true;
+        this.edit.loading = true
         updateGroupItemToApi(this.edit.row.id, this.edit.data).then(() => {
           // 原数据更新
-          this.edit.row.name = this.edit.data.name;
-          this.edit.row.email = this.edit.data.email;
-          this.edit.row.phone = this.edit.data.phone;
+          this.edit.row.name = this.edit.data.name
+          this.edit.row.email = this.edit.data.email
+          this.edit.row.phone = this.edit.data.phone
           // 隐藏表单
-          this.edit.show = false;
-        }).catch(err => console.log(err)).finally(() => this.edit.loading = false);
-      },
-      // 重置密码
-      resetPassword(row) {
-        this.$prompt('您将要重置该群组的密码啊，请您输入密码', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          inputPattern: /^.{6,}$/,
-          inputErrorMessage: '密码最少六位字符'
-        }).then(({ value }) => {
-          resetGroupPasswordToApi(row.id, value ? value : 123456);
-          this.$message('成功后会有信息提示，后台正在进行密码重置...');
-        }).catch(err => console.log(err));
+          this.edit.show = false
+        }).catch(err => console.log(err)).finally(() => this.edit.loading = false)
       },
       // 移除标签
       removeLabelFromGroup(row, item) {
@@ -304,38 +303,53 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        })
-        .then(() => deleteGroupLabelItemToApi(row.id, item.id))
-        .then(response => {
+        }).then(() => deleteGroupLabelItemToApi(row.id, item.id)).then(response => {
           row.labels.forEach((val, key) => {
             if (val.id === item.id) {
               row.labels.splice(key, 1)
             }
           })
-        }).catch(err => console.log(err));
+        }).catch(err => console.log(err))
       },
       // 展示添加群组标签表单
       showAddGroupLabelForm(row) {
-        this.label.row = row;
-        this.label.show = true;
-        this.label.status = true;
-        if (this.groupCollegeLabels.length === 0) {
-          this.labelLoading = true;
-          this.$store.dispatch('fetchLabelList').finally(() => this.labelLoading = false);
-        }
+        this.label.row = row
+        this.label.show = true
+        this.label.status = true
       },
       // 添加群组标签
       addLabelToGroup() {
         this.label.loading = true
         addGroupLabelItemToApi(this.label.row.id, this.label.data).then(response => {
-          this.label.row.labels.push(response.data)
+          this.label.row.labels = []
+          response.data.forEach(item => this.label.row.labels.push(item))
           this.label.show = false
-        }).catch(err => console.log(err)).finally(() => this.label.loading = false);
+        }).catch(err => console.log(err)).finally(() => this.label.loading = false)
       },
       // 查看成员
       goToMembers(groupId) {
         this.$router.push({ name: '群组成员', params: { groupId }})
-      }
+      },
+      // 删除
+      deleteItem(row) {
+        this.$confirm(`此操作将删除『${row.name}』群组, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => deleteGroupItemToApi(row.id)).then(response => {
+          row.deleted_at = true
+        }).catch(err => console.log(err))
+      },
+      // 启用
+      restoreItem(row) {
+        this.$confirm(`此操作将启用『${row.name}』群组, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => restoreGroupItemToApi(row.id)).then(() => {
+          row.deleted_at = false
+        }).catch(err => console.log(err))
+      },
     }
   }
 </script>

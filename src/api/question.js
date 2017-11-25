@@ -7,15 +7,12 @@ const baseUriWithLine = baseUri + '/'
 // 列表
 export function getQuestionListFromApi(params) {
   // 特殊参数处理
-  const keys = ['chapter', 'section', 'star', 'book', 'knowledge'];
-  
+  const keys = ['chapter', 'section', 'star', 'book', 'knowledge']
   const fields = keys.filter(item => params[item] !== null && params[item] !== undefined)
-  
   if (fields.length > 0) {
     params.label_id = []
     fields.forEach(item => params.label_id.push(params[item]))
   }
-  
   return fetch({
     url: baseUri,
     method: 'GET',

@@ -1,8 +1,12 @@
 import fetch from '@/utils/fetch'
+
+const baseUri = '/group'
+const baseUriWithLine = '/group/'
+
 // 列表
 export function getGroupListFromApi(params) {
   return fetch({
-    url: '/group',
+    url: baseUri,
     method: 'GET',
     params
   })
@@ -10,14 +14,14 @@ export function getGroupListFromApi(params) {
 // 详情
 export function getGroupItemFromApi(id) {
   return fetch({
-    url: '/group/' + id,
+    url: baseUriWithLine + id,
     method: 'GET'
   })
 }
 // 创建
 export function addGroupItemToApi(data) {
   return fetch({
-    url: '/group',
+    url: baseUri,
     method: 'POST',
     data
   })
@@ -25,7 +29,7 @@ export function addGroupItemToApi(data) {
 // 更新
 export function updateGroupItemToApi(id, data) {
   return fetch({
-    url: '/group/' + id,
+    url: baseUriWithLine + id,
     method: 'PUT',
     data
   })
@@ -33,14 +37,14 @@ export function updateGroupItemToApi(id, data) {
 // 删除
 export function deleteGroupItemToApi(id) {
   return fetch({
-    url: '/group/' + id,
+    url: baseUriWithLine + id,
     method: 'DELETE'
   })
 }
 // 恢复
 export function restoreGroupItemToApi(id) {
   return fetch({
-    url: '/group/' + id + '/restore',
+    url: baseUriWithLine + id + '/restore',
     method: 'PATCH'
   })
 }
