@@ -8,6 +8,9 @@ import router from './router'
 import store from './store'
 import '@/icons' // icon
 import '@/permission' // 权限
+// Qrcode
+import VueQRCodeComponent from 'vue-qrcode-component'
+Vue.component('qr-code', VueQRCodeComponent)
 
 Array.prototype.contains = function ( needle ) {
   for (let i in this) {

@@ -13,6 +13,7 @@ const getters = {
   questionSectionLabels: state => state.label.list.filter(item => item.upid === 32),
   questionKnowledgeLabels: state => state.label.list.filter(item => item.upid === 43),
   questionStarLabels: state => state.label.list.filter(item => item.upid === 48),
-  questionTypeLabels: state => [{id: 1, name: '单选题'}, {id: 2, name: '多选题'}]
+  questionTypeLabels: state => [{id: 1, name: '单选题'}, {id: 2, name: '多选题'}],
+  levelEqualTwo: state => state.label.list.filter(item => item.level === 2)
 }
 export default getters

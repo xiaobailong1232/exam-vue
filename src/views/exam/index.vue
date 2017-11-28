@@ -69,10 +69,14 @@
           <el-input v-model="form.data.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="试卷">
-          <el-input v-model="form.data.paper_id" auto-complete="off"></el-input>
+          <el-select v-model="form.data.paper_id" filterable clearable placeholder="请选择" style="width: 400px">
+            <el-option v-for="item in papers" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="群组">
-          <el-input v-model="form.data.group_id" auto-complete="off"></el-input>
+          <el-select v-model="form.data.group_id" filterable clearable placeholder="请选择" style="width: 400px">
+            <el-option v-for="item in groups" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="开始时间">
           <el-input v-model="form.data.started_at" auto-complete="off"></el-input>
@@ -95,10 +99,14 @@
           <el-input v-model="edit.data.name" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
         <el-form-item label="试卷">
-          <el-input v-model="edit.data.paper_id" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-select v-model="edit.data.paper_id" filterable clearable placeholder="请选择" style="width: 400px" :disabled="!edit.status">
+            <el-option v-for="item in papers" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="群组">
-          <el-input v-model="edit.data.group_id" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-select v-model="edit.data.group_id" filterable clearable placeholder="请选择" style="width: 400px" :disabled="!edit.status">
+            <el-option v-for="item in groups" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="开始时间">
           <el-input v-model="edit.data.started_at" auto-complete="off" :disabled="!edit.status"></el-input>
@@ -125,11 +133,11 @@
   } from '@/api/exam'
   
   import {
-    getPaperItemFromApi
+    getPaperListFromApi
   } from '@/api/paper'
   
   import {
-    getGroupItemFromApi
+    getGroupListFromApi
   } from '@/api/group'
   
   import { filterNullOfObject } from '@/utils/index'
@@ -137,6 +145,8 @@
   export default {
     created() {
       this.initFetch()
+      this.getPapers()
+      this.getGroups()
     },
     data() {
       return {
@@ -176,6 +186,8 @@
             stopped_at: null
           }
         },
+        papers: [],
+        groups: []
       }
     },
     methods: {
@@ -198,7 +210,7 @@
         this.$router.push({
           path: this.$route.path,
           query: query
-        });
+        })
       },
       // 切换分页大小
       handleSizeChange(val) {
@@ -282,6 +294,26 @@
       // Go To Group
       goToGroup(exmaId, groupId) {
         this.$router.push({ name: '考试群组', params: { examId: exmaId, paperId: groupId}})
+      },
+      // 读取试卷信息
+      getPapers() {
+        if (this.papers.length === 0) {
+          getPaperListFromApi({ page: 1, size: 1000 }).then(response => {
+            this.papers = response.data
+          }).catch(err => {
+            console.log(err)
+          }).finally(err => console.log(err))
+        }
+      },
+      // 读取群组信息
+      getGroups() {
+        if (this.papers.length === 0) {
+          getGroupListFromApi({ page: 1, size: 1000 }).then(response => {
+            this.groups = response.data
+          }).catch(err => {
+            console.log(err)
+          }).finally(err => console.log(err))
+        }
       }
     }
   }

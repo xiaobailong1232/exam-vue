@@ -12,7 +12,8 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(config => {
   if (store.getters.token) {
-    config.headers['X-Token'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    console.log(getToken())
+    config.headers['admin-token'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   return config
 }, error => {
@@ -57,7 +58,7 @@ service.interceptors.response.use(
     // 超时的错误
     if (!error.response) {
       Notification({
-        title: '服务器连接超时',
+        title: error.response.status,
         message: error.message || '出现了一个未预料的错误',
         type: 'error',
         duration: 3000
@@ -80,7 +81,7 @@ service.interceptors.response.use(
     // 权限错误
     else if (error.response.status === 403) {
       Notification({
-        title: '禁止',
+        title: error.response.status,
         message: error.response.data.message || '超出允许的权限范围',
         type: 'error',
         duration: 3000,
@@ -90,7 +91,7 @@ service.interceptors.response.use(
     // 未找到
     else if (error.response.status === 404) {
       Notification({
-        title: '未找到',
+        title: error.response.status,
         message: error.response.data.message,
         type: 'error',
         duration: 3000,
@@ -103,7 +104,7 @@ service.interceptors.response.use(
       console.log(error.response.message);
       messages.forEach((item, index) => {
         Notification({
-          title: error.response.message || '参数错误',
+          title: error.response.message || error.response.status,
           message: item.join(''),
           type: 'error',
           offset: 80 * index

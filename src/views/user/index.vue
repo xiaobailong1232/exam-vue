@@ -43,12 +43,12 @@
           <el-button size="mini" :type="prop.row.is_active ? 'success' : 'danger'" @click="toggleActive(prop.row)">{{ prop.row.is_active ? '是' : '否' }}</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="角色">
-        <template slot-scope="prop">
-          <el-tag v-if="prop.row.roles.length > 0" v-for="item in prop.row.roles" :key="item.id" closable type="primary" @close="removeRoleFromUser(prop.row, item)">{{item.name}}</el-tag>
-          <el-button size="mini" @click="showAddUserRoleForm(prop.row)">+ 角色</el-button>
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="角色">-->
+        <!--<template slot-scope="prop">-->
+          <!--<el-tag v-if="prop.row.roles.length > 0" v-for="item in prop.row.roles" :key="item.id" closable type="primary" @close="removeRoleFromUser(prop.row, item)">{{item.name}}</el-tag>-->
+          <!--<el-button size="mini" @click="showAddUserRoleForm(prop.row)">+ 角色</el-button>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column label="操作">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>

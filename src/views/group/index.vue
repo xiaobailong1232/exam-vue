@@ -147,6 +147,12 @@
       </div>
     </el-dialog>
     <!-- 弹出层：添加标签 end -->
+    
+    <!-- 弹出层 二维码 start -->
+    <el-dialog :title="qrcode.title" :visible.sync="qrcode.show" v-if="qrcode.show">
+      <qr-code :text="qrcode.text"></qr-code>
+    </el-dialog>
+    <!-- 弹出层 二维码 end -->
   </div>
 </template>
 
@@ -224,6 +230,13 @@
             major: null,
             class: null
           }
+        },
+        // 二维码
+        qrcode: {
+          title: '',
+          text: '',
+          show: false,
+          url: 'localhost:9528/#/register/'
         }
       }
     },
@@ -355,7 +368,9 @@
       },
       // 展示二维码
       showQrcode(row) {
-        console.log(row)
+        this.qrcode.title = `${row.name} 录入学员`
+        this.qrcode.text = this.qrcode.url + row.id
+        this.qrcode.show = true
       }
     }
   }

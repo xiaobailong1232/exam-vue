@@ -24,7 +24,10 @@
 </template>
 
 <script>
+import IconSvg from "../../components/Icon-svg/index.vue";
+
 export default {
+  components: {IconSvg},
   name: 'SidebarItem',
   props: {
     routes: {

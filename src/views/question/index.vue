@@ -270,11 +270,11 @@
     addQuestionItemToApi,
     updateQuestionItemToApi,
     deleteQuestionItemToApi
-  } from '@/api/question';
+  } from '@/api/question'
   
   import {
     addQuestionLabelItemToApi,
-    deleteQuestionLabelItemToApi,
+    deleteQuestionLabelItemToApi
   } from '@/api/questionLabel'
   
   import { mapGetters } from 'vuex'
@@ -301,7 +301,7 @@
         'questionKnowledgeLabels',
         'questionStarLabels',
         'questionTypeLabels',
-        'questionStarLabels',
+        'questionStarLabels'
       ])
     },
     data() {

@@ -1,7 +1,7 @@
 import fetch from '@/utils/fetch'
 
-const baseUri = '/record';
-const baseUriWithLine = '/record/';
+const baseUri = '/record'
+const baseUriWithLine = '/record/'
 
 // 列表
 export function getRecordListFromApi(params) {
