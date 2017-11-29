@@ -3,7 +3,7 @@
  */
 
 export function isvalidUsername(str) {
-  return (isPhone(str) || str.indexOf(str))
+  return str && (isPhone(str) || str.indexOf(str))
 }
 
 /* 合法uri*/
