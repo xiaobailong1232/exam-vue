@@ -236,7 +236,7 @@
           title: '',
           text: '',
           show: false,
-          url: 'localhost:9528/#/register/'
+          url: process.env.QRCODE_API
         }
       }
     },
