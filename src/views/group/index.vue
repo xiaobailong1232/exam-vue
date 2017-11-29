@@ -369,7 +369,7 @@
       // 展示二维码
       showQrcode(row) {
         this.qrcode.title = `${row.name} 录入学员`
-        this.qrcode.text = this.qrcode.url + row.id
+        this.qrcode.text = this.qrcode.url + '/' + row.id
         this.qrcode.show = true
       }
     }
