@@ -125,16 +125,9 @@
 </template>
 
 <script>
-  import {
-    getExamListFromApi,
-    addExamItemToApi,
-    updateExamItemToApi,
-    deleteExamItemToApi
-  } from '@/api/exam'
+  import { getExamListFromApi, addExamItemToApi, updateExamItemToApi, deleteExamItemToApi } from '@/api/exam'
   
-  import {
-    getPaperListFromApi
-  } from '@/api/paper'
+  import { getPaperListFromApi } from '@/api/paper'
   
   import {
     getGroupListFromApi
