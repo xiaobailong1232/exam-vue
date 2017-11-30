@@ -55,3 +55,15 @@ export function resetUserPasswordToApi(id, password) {
     }
   })
 }
+
+// 批量注册
+export function batchRegister(group_id, users) {
+  return fetch({
+    url: '/user/batch-register',
+    method: 'POST',
+    data: {
+      group_id,
+      users
+    }
+  })
+}

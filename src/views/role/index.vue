@@ -1,252 +1,227 @@
 <template>
-  <div class="app-container">
-    <!-- 搜索框 start -->
-    <div class="search-bar">
-      <el-form :inline="true">
-        <el-form-item>
-          <el-input v-model="search.name" placeholder="请输入名称" @keyup.enter.native="handleSearch"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="handleSearch" @keyup.enter.native="handleSearch"></el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-    <!-- 搜索框 start -->
-    
-    <!-- 操作按钮 start -->
-    <div class="search-bar">
-      <el-form :inline="true">
-        <el-form-item>
-          <el-button type="primary" @click="showAddForm" icon="el-icon-plus"></el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-    <!-- 操作按钮 start -->
-    
-    <!-- 主要表格 start -->
-    <el-table :data="table" border style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="180"></el-table-column>
-      <el-table-column prop="name" label="名称" width="180"></el-table-column>
-      <el-table-column prop="level" label="等级"></el-table-column>
-      <el-table-column prop="upid" label="父级ID"></el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="prop">
-          <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
-          <el-button size="mini" type="info" icon="el-icon-info" @click="showDetailForm(prop.row)"></el-button>
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteItem(prop.row)"></el-button>
-        </template>
-      </el-table-column>
+  <div class="index" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中...">
+    <input type="file" @change="importFile(this)" id="imFile" style="display: none"
+           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
+    <a id="downlink"></a>
+    <el-button class="button" @click="uploadFile()">导入</el-button>
+    <el-button class="button" @click="downloadFile(excelData)">导出</el-button>
+    <!--错误信息提示-->
+    <el-dialog title="提示" v-model="errorDialog" size="tiny">
+      <span>{{errorMsg}}</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="errorDialog=false">确认</el-button>
+  </span>
+    </el-dialog>
+    <!--展示导入信息-->
+    <el-table :data="excelData" tooltip-effect="dark">
+      <el-table-column label="名称" prop="name" show-overflow-tooltip></el-table-column>
+      <el-table-column label="分量" prop="size" show-overflow-tooltip></el-table-column>
+      <el-table-column label="口味" prop="taste" show-overflow-tooltip></el-table-column>
+      <el-table-column label="单价(元)" prop="price" show-overflow-tooltip></el-table-column>
+      <el-table-column label="剩余(份)" prop="remain" show-overflow-tooltip></el-table-column>
     </el-table>
-    <!-- 主要表格 start -->
-    
-    <!-- 分页 start -->
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="search.page"
-      :page-sizes="[10, 25, 50, 100]"
-      :page-size="search.size"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="search.total">
-    </el-pagination>
-    <!-- 分页 end -->
-    
-    <!-- 弹出层：创建角色 start -->
-    <el-dialog title="创建角色" :visible.sync="form.show" :width="'400px'">
-      <el-form :model="form.data" :label-width="'100px'">
-        <el-form-item label="名称">
-          <el-input v-model="form.data.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="等级">
-          <el-input v-model="form.data.level" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="父级">
-          <el-input v-model="form.data.upid" auto-complete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="form.show = false">取 消</el-button>
-        <el-button type="primary" @click="addItem" :loading="form.loading">确定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 弹出层：创建角色 end -->
-    
-    <!-- 弹出层：修改角色基本信息 start -->
-    <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
-      <el-form :model="edit.data" :label-width="'120px'">
-        <el-form-item label="Name">
-          <el-input v-model="edit.data.name" auto-complete="off" :disabled="!edit.status"></el-input>
-        </el-form-item>
-        <el-form-item label="等级">
-          <el-input v-model="edit.data.level" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="父级">
-          <el-input v-model="edit.data.upid" auto-complete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer" v-show="edit.status">
-        <el-button @click="edit.show = false">取 消</el-button>
-        <el-button type="primary" @click="updateItem" :loading="edit.loading">更新</el-button>
-      </div>
-    </el-dialog>
-    <!-- 弹出层：修改角色基本信息 end -->
-    
   </div>
 </template>
 
 <script>
-  import {
-    getRoleListFromApi,
-    addRoleItemToApi,
-    updateRoleItemToApi,
-    deleteRoleItemToApi,
-    restoreRoleItemToApi,
-  } from '@/api/role';
-  
-  import { mapGetters } from 'vuex';
-  
-  import { filterNullOfObject } from '@/utils/index';
-  
+  // 引入xlsx
+  var XLSX = require('xlsx')
   export default {
-    created () {
-      this.initFetch();
-    },
-    computed: {
-    
-    },
-    data() {
+    name: 'Index',
+    data () {
       return {
-        // 基础数据
-        loading: false,
-        table: [],
-        search: {
-          page: 1,
-          size: 10,
-          total: 0,
-          name: null,
-          delted_at: null
-        },
-        labelLoading: false,// 获取标签时的啊loading状态
-        // 创建角色
-        form: {
-          show: false,
-          loading: false,
-          data: {
-            name: null,
-            level: null,
-            upid: null
+        fullscreenLoading: false, // 加载中
+        imFile: '', // 导入文件el
+        outFile: '',  // 导出文件el
+        errorDialog: false, // 错误信息弹窗
+        errorMsg: '', // 错误信息内容
+        excelData: [  // 测试数据
+          {
+            name: '红烧鱼', size: '大', taste: '微辣', price: '40', remain: '100'
+          },
+          {
+            name: '麻辣小龙虾', size: '大', taste: '麻辣', price: '138', remain: '200'
+          },
+          {
+            name: '清蒸小龙虾', size: '大', taste: '清淡', price: '138', remain: '200'
+          },
+          {
+            name: '香辣小龙虾', size: '大', taste: '特辣', price: '138', remain: '200'
+          },
+          {
+            name: '十三香小龙虾', size: '大', taste: '中辣', price: '138', remain: '108'
+          },
+          {
+            name: '蒜蓉小龙虾', size: '大', taste: '中辣', price: '138', remain: '100'
+          },
+          {
+            name: '凉拌牛肉', size: '中', taste: '中辣', price: '48', remain: '60'
+          },
+          {
+            name: '虾仁寿司', size: '大', taste: '清淡', price: '29', remain: '无限'
+          },
+          {
+            name: '海苔寿司', size: '大', taste: '微辣', price: '26', remain: '无限'
+          },
+          {
+            name: '金针菇寿司', size: '大', taste: '清淡', price: '23', remain: '无限'
+          },
+          {
+            name: '泡菜寿司', size: '大', taste: '微辣', price: '24', remain: '无限'
+          },
+          {
+            name: '鳗鱼寿司', size: '大', taste: '清淡', price: '28', remain: '无限'
+          },
+          {
+            name: '肉松寿司', size: '大', taste: '清淡', price: '22', remain: '无限'
+          },
+          {
+            name: '三文鱼寿司', size: '大', taste: '清淡', price: '30', remain: '无限'
+          },
+          {
+            name: '蛋黄寿司', size: '大', taste: '清淡', price: '20', remain: '无限'
           }
-        },
-        // 详情 与 编辑的属性
-        edit: {
-          show: false,// 当false时，不显示。当true是，显示。
-          status: false,// 当false时，显示详情表单。当true是，显示编辑表单。
-          loading: false,
-          row: null,// 保存角色信息
-          data: {
-            name: null,
-            level: null,
-            upid: null
-          }
-        },
+        ]
       }
     },
+    mounted () {
+      this.imFile = document.getElementById('imFile')
+      this.outFile = document.getElementById('downlink')
+    },
     methods: {
-      // 进入页面即读取数据
-      initFetch() {
-        // 格式化URL参数
-        this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1;
-        this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10;
-        this.search.name = this.$route.query.name ? this.$route.query.name : null;
-        this.search.level = this.$route.query.level ? this.$route.query.level : null;
-        this.search.upid = this.$route.query.upid ? this.$route.query.upid : null;
-        this.loading = true;
-        getRoleListFromApi(this.search).then(response => {
-          this.search.total = Number.parseInt(response.total);
-          this.table = response.data
-        }).catch(err => console.log(err)).finally(() => this.loading = false);
+      uploadFile: function () { // 点击导入按钮
+        this.imFile.click()
       },
-      // 推入历史记录
-      pushRoute() {
-        // 过滤无用参数，否则会报错
-        const query = filterNullOfObject(this.search);
-        this.$router.push({
-          path: this.$route.path,
-          query: query
-        });
+      downloadFile: function (rs) { // 点击导出按钮
+        let data = [{}]
+        for (let k in rs[0]) {
+          data[0][k] = k
+        }
+        data = data.concat(rs)
+        this.downloadExl(data, '菜单')
       },
-      // 切换分页大小
-      handleSizeChange (val) {
-        this.search.size = val;
-        this.pushRoute();
+      importFile: function () { // 导入excel
+        this.fullscreenLoading = true
+        let obj = this.imFile
+        if (!obj.files) {
+          this.fullscreenLoading = false
+          return
+        }
+        var f = obj.files[0]
+        var reader = new FileReader()
+        let $t = this
+        reader.onload = function (e) {
+          var data = e.target.result
+          if ($t.rABS) {
+            $t.wb = XLSX.read(btoa(this.fixdata(data)), {  // 手动转化
+              type: 'base64'
+            })
+          } else {
+            $t.wb = XLSX.read(data, {
+              type: 'binary'
+            })
+          }
+          let json = XLSX.utils.sheet_to_json($t.wb.Sheets[$t.wb.SheetNames[0]])
+          console.log(typeof json)
+          $t.dealFile($t.analyzeData(json)) // analyzeData: 解析导入数据
+        }
+        if (this.rABS) {
+          reader.readAsArrayBuffer(f)
+        } else {
+          reader.readAsBinaryString(f)
+        }
       },
-      // 当前页切换
-      handleCurrentChange(val) {
-        this.search.page = val;
-        this.pushRoute();
-      },
-      // 搜索
-      handleSearch() {
-        this.pushRoute();
-      },
-      // 创建角色
-      showAddForm() {
-        this.form.show = true;
-      },
-      // 添加角色
-      addItem() {
-        this.form.loading = true
-        addRoleItemToApi(this.form.data).then(response => {
-          this.table.unshift(response.data)
-          this.form.show = false
-        }).catch(err => console.log(err)).finally(() => this.form.loading = false)
-      },
-      // 详细信息
-      showDetailForm(row) {
-        this.edit.status = false;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.name = row.name;
-        this.edit.data.level = row.level;
-        this.edit.data.upid = row.upid;
-      },
-      // 编辑信息
-      showEditForm(row) {
-        this.edit.status = true;
-        this.edit.show = true;
-        this.edit.row = row;
-        this.edit.data.name = row.name;
-        this.edit.data.level = row.level;
-        this.edit.data.upid = row.upid;
-      },
-      // 更新信息
-      updateItem() {
-        this.edit.loading = true;
-        updateRoleItemToApi(this.edit.row.id, this.edit.data).then(() => {
-          // 原数据更新
-          this.edit.row.name = this.edit.data.name;
-          this.edit.row.level = this.edit.data.level;
-          this.edit.row.upid = this.edit.data.upid;
-          // 隐藏表单
-          this.edit.show = false;
-        }).catch(err => console.log(err)).finally(() => this.edit.loading = false);
-      },
-      // 删除
-      deleteItem(row) {
-        this.$confirm(`此操作将删除『${row.name}』题目, 是否继续?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
+      downloadExl: function (json, downName, type) {  // 导出到excel
+        let keyMap = [] // 获取键
+        for (let k in json[0]) {
+          keyMap.push(k)
+        }
+        console.info('keyMap', keyMap, json)
+        let tmpdata = [] // 用来保存转换好的json
+        json.map((v, i) => keyMap.map((k, j) => Object.assign({}, {
+          v: v[k],
+          position: (j > 25 ? this.getCharCol(j) : String.fromCharCode(65 + j)) + (i + 1)
+        }))).reduce((prev, next) => prev.concat(next)).forEach(function (v) {
+          tmpdata[v.position] = {
+            v: v.v
+          }
         })
-        .then(() => deleteRoleItemToApi(row.id))
-        .then(response => {
-          this.table.forEach((item, key) => {
-            if (item.id === row.id) {
-              this.table.splice(key, 1)
-            }
-          })
-        }).catch(err => console.log(err));
+        let outputPos = Object.keys(tmpdata)  // 设置区域,比如表格从A1到D10
+        let tmpWB = {
+          SheetNames: ['mySheet'], // 保存的表标题
+          Sheets: {
+            'mySheet': Object.assign({},
+              tmpdata, // 内容
+              {
+                '!ref': outputPos[0] + ':' + outputPos[outputPos.length - 1] // 设置填充区域
+              })
+          }
+        }
+        let tmpDown = new Blob([this.s2ab(XLSX.write(tmpWB,
+          {bookType: (type === undefined ? 'xlsx' : type), bookSST: false, type: 'binary'} // 这里的数据是用来定义导出的格式类型
+        ))], {
+          type: ''
+        })  // 创建二进制对象写入转换好的字节流
+        var href = URL.createObjectURL(tmpDown)  // 创建对象超链接
+        this.outFile.download = downName + '.xlsx'  // 下载名称
+        this.outFile.href = href  // 绑定a标签
+        this.outFile.click()  // 模拟点击实现下载
+        setTimeout(function () {  // 延时释放
+          URL.revokeObjectURL(tmpDown) // 用URL.revokeObjectURL()来释放这个object URL
+        }, 100)
       },
+      analyzeData: function (data) {  // 此处可以解析导入数据
+        return data
+      },
+      dealFile: function (data) {   // 处理导入的数据
+        console.log(data)
+        this.imFile.value = ''
+        this.fullscreenLoading = false
+        if (data.length <= 0) {
+          this.errorDialog = true
+          this.errorMsg = '请导入正确信息'
+        } else {
+          this.excelData = data
+        }
+      },
+      s2ab: function (s) { // 字符串转字符流
+        var buf = new ArrayBuffer(s.length)
+        var view = new Uint8Array(buf)
+        for (var i = 0; i !== s.length; ++i) {
+          view[i] = s.charCodeAt(i) & 0xFF
+        }
+        return buf
+      },
+      getCharCol: function (n) { // 将指定的自然数转换为26进制表示。映射关系：[0-25] -> [A-Z]。
+        let s = ''
+        let m = 0
+        while (n > 0) {
+          m = n % 26 + 1
+          s = String.fromCharCode(m + 64) + s
+          n = (n - m) / 26
+        }
+        return s
+      },
+      fixdata: function (data) {  // 文件流转BinaryString
+        var o = ''
+        var l = 0
+        var w = 10240
+        for (; l < data.byteLength / w; ++l) {
+          o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w, l * w + w)))
+        }
+        o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)))
+        return o
+      }
     }
   }
 </script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+  .el-table th>.cell {
+    text-align: center;
+  }
+  .button {
+    margin-bottom: 20px;
+  }
+</style>

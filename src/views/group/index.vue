@@ -57,8 +57,8 @@
       <el-table-column label="操作" witdh="100">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
-          <el-tooltip class="item" effect="dark" content="显示注册二维码" placement="top">
-            <el-button size="mini" type="success" icon="el-icon-plus" @click="showQrcode(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          <el-tooltip class="item" effect="dark" content="导入学员" placement="top">
+            <el-button size="mini" type="success" icon="el-icon-plus" @click="goToImport(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -371,6 +371,10 @@
         this.qrcode.title = `${row.name} 录入学员`
         this.qrcode.text = this.qrcode.url + '/' + row.id
         this.qrcode.show = true
+      },
+      // 显示导入页面
+      goToImport(row) {
+        this.$router.push({ name: '导入成员', params: { groupId: row.id } })
       }
     }
   }

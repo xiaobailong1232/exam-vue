@@ -45,8 +45,9 @@ export const constantRouterMap = [
     icon: 'zujian',
     noDropdown: true,
     children: [
-      { path: 'index', name: '群组管理', icon: 'zujian', component: _import('group/index') },
-      { path: ':groupId/member', name: '群组成员', component: _import('group/member') }
+      { path: 'index', name: '群组管理', component: _import('group/index') },
+      { path: ':groupId/member', name: '群组成员', component: _import('group/member') },
+      { path: ':groupId/import', name: '导入成员', component: _import('group/importMember') }
     ]
   },
   {
