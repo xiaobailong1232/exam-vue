@@ -35,7 +35,7 @@ service.interceptors.response.use(
     // 创建成功
     else if (response.status === 201) {
       Message({
-        message: response.message || '创建成功',
+        message: '添加成功',
         type: 'success',
         duration: 5 * 1000
       })
@@ -44,7 +44,7 @@ service.interceptors.response.use(
     // 操作成功
     else if (response.status === 204) {
       Message({
-        message: response.message || '操作成功',
+        message: '操作成功',
         type: 'success',
         duration: 5 * 1000
       })
@@ -58,8 +58,8 @@ service.interceptors.response.use(
     // 超时的错误
     if (!error.response) {
       Notification({
-        title: error.response.status,
-        message: error.message || '出现了一个未预料的错误',
+        title: '服务器错误',
+        message: '出现了一个未预料的错误',
         type: 'error',
         duration: 3000
       });
@@ -81,7 +81,7 @@ service.interceptors.response.use(
     // 权限错误
     else if (error.response.status === 403) {
       Notification({
-        title: error.response.status,
+        title: '未授权',
         message: error.response.data.message || '超出允许的权限范围',
         type: 'error',
         duration: 3000,
@@ -91,7 +91,7 @@ service.interceptors.response.use(
     // 未找到
     else if (error.response.status === 404) {
       Notification({
-        title: error.response.status,
+        title: '404 Not Found',
         message: error.response.data.message,
         type: 'error',
         duration: 3000,
@@ -101,10 +101,9 @@ service.interceptors.response.use(
     // 参数错误
     else if (error.response.status === 422) {
       const messages = [...Object.values(error.response.data.errors)];
-      console.log(error.response.message);
       messages.forEach((item, index) => {
         Notification({
-          title: error.response.message || error.response.status,
+          title: '参数错误',
           message: item.join(''),
           type: 'error',
           offset: 80 * index

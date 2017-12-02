@@ -130,7 +130,7 @@ export const constantRouterMap = [
     icon: 'zonghe',
     noDropdown: true,
     children: [
-      { path: 'index', name: '答题记录', icon: 'zonghe', component: _import('record/index') }
+      { path: 'index', name: '答题记录', icon: 'zonghe', component: _import('record/index') },
     ]
   },
   { path: '*', redirect: '/404', hidden: true },

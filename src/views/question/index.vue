@@ -72,7 +72,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="id" label="ID" width="60"></el-table-column>
+      <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="title" label="题目名称" width="500"></el-table-column>
       <el-table-column label="类型" width="80">
         <template slot-scope="prop">
@@ -81,7 +81,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="star" label="难度星级" width="60"></el-table-column>
+      <el-table-column prop="star" label="难度" width="60"></el-table-column>
       <el-table-column label="属性">
         <template slot-scope="prop">
           <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable
@@ -93,7 +93,7 @@
       <el-table-column label="创建人">
         <template slot-scope="prop">{{ prop.row.user.name }}</template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="130">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
           <el-button size="mini" type="info" icon="el-icon-info" @click="showDetailForm(prop.row)"></el-button>

@@ -19,11 +19,18 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="phone" label="手机"></el-table-column>
+      <el-table-column prop="phone" label="手机" width="120"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="190">
         <template slot-scope="prop">
+          <el-tooltip class="item" effect="dark" content="编辑信息" placement="top">
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="重置密码" placement="top">
+            <el-button size="mini" type="warning" icon="el-icon-refresh" @click="resetPassword(prop.row)"></el-button>
+          </el-tooltip>
           <el-tooltip class="item" effect="dark" content="移除学员" placement="top">
             <el-button size="mini" type="danger" icon="el-icon-delete" @click="deletedMember(prop.row)"></el-button>
           </el-tooltip>
@@ -43,11 +50,32 @@
       :total="search.total">
     </el-pagination>
     <!-- 分页 end -->
+  
+    <!-- 弹出层：修改用户基本信息 start -->
+    <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
+      <el-form :model="edit.data" :label-width="'120px'">
+        <el-form-item label="姓名">
+          <el-input v-model="edit.data.name" auto-complete="off" :disabled="!edit.status"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="edit.data.email" auto-complete="off" :disabled="!edit.status"></el-input>
+        </el-form-item>
+        <el-form-item label="手机">
+          <el-input v-model="edit.data.phone" auto-complete="off" :disabled="!edit.status"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer" v-show="edit.status">
+        <el-button @click="edit.show = false">取 消</el-button>
+        <el-button type="primary" @click="updateItem" :loading="edit.loading">更新</el-button>
+      </div>
+    </el-dialog>
+    <!-- 弹出层：修改用户基本信息 end -->
   </div>
 </template>
 
 <script>
   import { getGroupMemberListFromApi, deleteGroupMemberItemToApi } from '@/api/groupMembers'
+  import { updateUserItemToApi, resetUserPasswordToApi, } from '@/api/user'
   
   import { filterNullOfObject } from '@/utils/index'
   
@@ -65,6 +93,18 @@
           total: 0,
           name: null,
           phone: null
+        },
+        // 详情 与 编辑的属性
+        edit: {
+          show: false, // 当false时，不显示。当true是，显示。
+          status: false, // 当false时，显示详情表单。当true是，显示编辑表单。
+          loading: false,
+          row: null, // 保存用户信息
+          data: {
+            name: null,
+            email: null,
+            phone: null
+          }
         }
       }
     },
@@ -122,7 +162,40 @@
             }
           })
         }).catch(err => console.log(err))
-      }
+      },
+      // 重置密码
+      resetPassword(row) {
+        this.$prompt('您将要重置该用户的密码，请您输入密码', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /^.{6,}$/,
+          inputErrorMessage: '密码最少六位字符'
+        }).then(({ value }) => {
+          resetUserPasswordToApi(row.id, value ? value : 123456)
+          this.$message('成功后会有信息提示，后台正在进行密码重置...')
+        }).catch(err => console.log(err))
+      },
+      // 编辑信息
+      showEditForm(row) {
+        this.edit.status = true;
+        this.edit.show = true;
+        this.edit.row = row;
+        this.edit.data.name = row.name;
+        this.edit.data.email = row.email;
+        this.edit.data.phone = row.phone;
+      },
+      // 更新信息
+      updateItem() {
+        this.edit.loading = true;
+        updateUserItemToApi(this.edit.row.id, this.edit.data).then(() => {
+          // 原数据更新
+          this.edit.row.name = this.edit.data.name;
+          this.edit.row.email = this.edit.data.email;
+          this.edit.row.phone = this.edit.data.phone;
+          // 隐藏表单
+          this.edit.show = false;
+        }).catch(err => console.log(err)).finally(() => this.edit.loading = false);
+      },
     }
   }
 </script>

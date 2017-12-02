@@ -4,10 +4,12 @@
     <div class="search-bar">
       <el-form :inline="true">
         <el-form-item>
-          <el-input v-model="search.name" placeholder="请输入名称" @keyup.enter.native="handleSearch"></el-input>
+          <el-input v-model="search.name" placeholder="请输入群组名称" @keyup.enter.native="handleSearch"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="handleSearch" @keyup.enter.native="handleSearch"></el-button>
+          <el-tooltip class="item" effect="dark" content="搜索" placement="top-start">
+            <el-button type="primary" icon="el-icon-search" @click="handleSearch" @keyup.enter.native="handleSearch"></el-button>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -17,7 +19,9 @@
     <div class="search-bar">
       <el-form :inline="true">
         <el-form-item>
-          <el-button type="primary" @click="showAddForm" icon="el-icon-plus"></el-button>
+          <el-tooltip class="item" effect="dark" content="添加群组" placement="top-start">
+            <el-button type="success" @click="showAddForm" icon="el-icon-plus"></el-button>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -25,15 +29,19 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
-      <el-table-column prop="name" label="名称" width="180"></el-table-column>
+      <el-table-column prop="id" label="ID" width="50"></el-table-column>
+      <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column label="创建人">
         <template slot-scope="prop">
           {{ prop.row.user.name }}
         </template>
       </el-table-column>
-      <el-table-column label="成员" width="100">
+      <el-table-column label="成员" width="70">
         <template slot-scope="prop">
-          <el-button size="mini" @click="goToMembers(prop.row.id)" :type="prop.row.members_count ? 'success' : 'warning'">{{ prop.row.members_count }}</el-button>
+          <el-tooltip class="item" effect="dark" content="查看成员列表" placement="top-start">
+            <el-button v-if="prop.row.members_count" @click="goToMembers(prop.row.id)" size="mini" type="info">{{ prop.row.members_count }}</el-button>
+            <el-button v-else size="mini" type="danger">{{ prop.row.members_count }}</el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column label="属性">
@@ -43,22 +51,27 @@
         </template>
       </el-table-column>
       
-      <el-table-column label="状态" width="100">
+      <el-table-column label="状态" width="80">
         <template slot-scope="prop">
           <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
-            <el-button size="mini" type="danger" icon="el-icon-error" @click="restoreItem(prop.row)"></el-button>
+            <el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
-            <el-button size="mini" type="success" icon="el-icon-success" @click="deleteItem(prop.row)"></el-button>
+            <el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>
           </el-tooltip>
         </template>
       </el-table-column>
       
-      <el-table-column label="操作" witdh="100">
+      <el-table-column label="操作" width="190">
         <template slot-scope="prop">
-          <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
-          <el-tooltip class="item" effect="dark" content="导入学员" placement="top">
-            <el-button size="mini" type="success" icon="el-icon-plus" @click="goToImport(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          <el-tooltip class="item" effect="dark" content="编辑信息" placement="top">
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="单个添加" placement="top">
+            <el-button size="mini" type="success" icon="el-icon-plus" @click="showAddMemberForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="Excel导入学员" placement="top">
+            <el-button size="mini" type="info" icon="el-icon-upload" @click="goToImport(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -147,12 +160,32 @@
       </div>
     </el-dialog>
     <!-- 弹出层：添加标签 end -->
-    
-    <!-- 弹出层 二维码 start -->
-    <el-dialog :title="qrcode.title" :visible.sync="qrcode.show" v-if="qrcode.show">
-      <qr-code :text="qrcode.text"></qr-code>
+  
+    <!-- 弹出层：创建用户 start -->
+    <el-dialog title="添加群组成员" :visible.sync="member.show"  :width="'500px'">
+      <el-form :model="member.data" :label-width="'100px'" :rules="member.rules" ref="addMemberForm">
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="member.data.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="member.data.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="phone">
+          <el-input v-model="member.data.phone" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="member.data.password" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="password_confirmation">
+          <el-input type="password" v-model="member.data.password_confirmation" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="member.show = false">取 消</el-button>
+        <el-button type="primary" @click="addMember('addMemberForm')" :loading="member.loading">确定</el-button>
+      </div>
     </el-dialog>
-    <!-- 弹出层 二维码 end -->
+    <!-- 弹出层：创建用户 end -->
   </div>
 </template>
 
@@ -162,7 +195,7 @@
     addGroupItemToApi,
     updateGroupItemToApi,
     deleteGroupItemToApi,
-    restoreGroupItemToApi,
+    restoreGroupItemToApi
   } from '@/api/group'
   
   import {
@@ -170,9 +203,15 @@
     deleteGroupLabelItemToApi
   } from '@/api/groupLabel'
   
+  import {
+    addGroupMemberItemToApi
+  } from '@/api/groupMembers'
+  
   import { mapGetters } from 'vuex'
   
   import { filterNullOfObject } from '@/utils/index'
+
+  import { isPhone } from '@/utils/validate'
   
   export default {
     created() {
@@ -189,6 +228,33 @@
       ...mapGetters(['groupCollegeLabels', 'groupClassLabels', 'groupMajorLabels'])
     },
     data() {
+      const validatePassword = (rule, value, callback) => {
+        if (!value || value === '' || value === undefined) {
+          callback(new Error('请输入密码'))
+        } else if (value.length < 6) {
+          callback(new Error('密码最小长度为6'))
+        } else {
+          callback()
+        }
+      }
+      const validatePassword2 = (rule, value, callback) => {
+        if (value === '' || value === undefined) {
+          callback(new Error('请再次输入密码'))
+        } else if (value !== this.member.data.password) {
+          callback(new Error('两次输入密码不一致!'))
+        } else {
+          callback()
+        }
+      }
+      const validatePhone = (rule, value, callback) => {
+        if (value === '' || value === undefined) {
+          callback(new Error('请输入手机'))
+        } else if (!isPhone(value)) {
+          callback(new Error('手机不合法!'))
+        } else {
+          callback()
+        }
+      }
       return {
         // 基础数据
         loading: false,
@@ -231,12 +297,39 @@
             class: null
           }
         },
-        // 二维码
-        qrcode: {
-          title: '',
-          text: '',
+        // 成员
+        member: {
           show: false,
-          url: process.env.QRCODE_API
+          loading: false,
+          data: {
+            name: null,
+            email: null,
+            phone: null,
+            password: null,
+            password_confirmation: null
+          },
+          rules: {
+            name: [
+              { required: true, message: '请输入姓名', trigger: 'blur' },
+              { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+            ],
+            phone: [
+              { required: true, message: '请输入手机', trigger: 'blur' },
+              { validator: validatePhone, trigger: 'blur' }
+            ],
+            email: [
+              { required: true, message: '请输入邮箱', trigger: 'blur' },
+              { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
+            ],
+            password: [
+              { required: true, message: '请输入密码', trigger: 'blur' },
+              { validator: validatePassword, trigger: 'blur' }
+            ],
+            password_confirmation: [
+              { required: true, message: '请输入密码', trigger: 'blur' },
+              { validator: validatePassword2, trigger: 'blur' }
+            ]
+          }
         }
       }
     },
@@ -366,15 +459,30 @@
           row.deleted_at = false
         }).catch(err => console.log(err))
       },
-      // 展示二维码
-      showQrcode(row) {
-        this.qrcode.title = `${row.name} 录入学员`
-        this.qrcode.text = this.qrcode.url + '/' + row.id
-        this.qrcode.show = true
-      },
       // 显示导入页面
       goToImport(row) {
         this.$router.push({ name: '导入成员', params: { groupId: row.id } })
+      },
+      // 展示添加群组成员表单
+      showAddMemberForm(row) {
+        this.member.show = true
+        this.member.row = row
+      },
+      // 添加群组成员
+      addMember(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.member.loading = true
+            addGroupMemberItemToApi(this.member.row.id, this.member.data).then(() => {
+              this.member.row.members_count += 1
+              this.member.show = false
+            }).catch(err => console.log(err)).finally(() => {
+              this.member.loading = false
+            })
+          } else {
+            return false
+          }
+        })
       }
     }
   }

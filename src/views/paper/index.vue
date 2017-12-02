@@ -25,26 +25,27 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="comment" label="描述"></el-table-column>
-      <el-table-column prop="created_at" label="创建时间"></el-table-column>
-      <el-table-column label="状态" width="100">
+      <el-table-column prop="created_at" label="创建时间" width="160"></el-table-column>
+      <el-table-column label="状态" width="90">
         <template slot-scope="prop">
           <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
-            <el-button size="mini" type="danger" icon="el-icon-error" @click="restoreItem(prop.row)"></el-button>
+            <el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
-            <el-button size="mini" type="success" icon="el-icon-success" @click="deleteItem(prop.row)"></el-button>
+            <el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="130">
         <template slot-scope="prop" v-if="!prop.row.deleted_at">
           <el-tooltip class="item" effect="dark" content="编辑基本信息" placement="top">
             <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="试卷题目信息" placement="top">
-            <el-button size="mini" type="success" icon="el-icon-plus" @click="goToShow(prop.row.id)"></el-button>
+            <el-button size="mini" type="info" icon="el-icon-info" @click="goToShow(prop.row.id)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>

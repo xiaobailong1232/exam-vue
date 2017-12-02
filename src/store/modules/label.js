@@ -15,6 +15,8 @@ const label = {
     },
     PUSH_LIST: (state, data) => {
       state.list.push(data)
+      // bug 去除
+      state.list.splice(-1, 1)
     },
     UPDATE_LIST: (state, params) => {
       state.list.forEach((item, key) => {

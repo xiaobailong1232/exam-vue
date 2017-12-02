@@ -4,7 +4,10 @@
     <div class="search-bar">
       <el-form :inline="true">
         <el-form-item>
-          <el-input v-model="search.name" placeholder="请输入名称" @keyup.enter.native="handleSearch"></el-input>
+          <el-input v-model="search.exam_name" placeholder="请输入考试名称" @keyup.enter.native="handleSearch"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="search.user_name" placeholder="请输入学员姓名" @keyup.enter.native="handleSearch"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" @click="handleSearch" @keyup.enter.native="handleSearch"></el-button>
@@ -15,9 +18,6 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
-      <el-table-column label="试卷名称" width="180">
-        <template slot-scope="prop">{{ prop.row.paper.name }}</template>
-      </el-table-column>
       <el-table-column label="考试名称">
         <template slot-scope="prop">{{ prop.row.exam.name }}</template>
       </el-table-column>
@@ -83,7 +83,9 @@
           page: 1,
           size: 10,
           total: 0,
-          name: null
+          user_name: null,
+          exam_name: null,
+          exam_id: null
         },
         record: {
           loading: false,
@@ -98,9 +100,9 @@
         // 格式化URL参数
         this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1
         this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10
-        this.search.name = this.$route.query.name ? this.$route.query.name : null
-        this.search.level = this.$route.query.level ? this.$route.query.level : null
-        this.search.upid = this.$route.query.upid ? this.$route.query.upid : null
+        this.search.user_name = this.$route.query.user_name ? this.$route.query.user_name : null
+        this.search.exam_name = this.$route.query.exam_name ? this.$route.query.exam_name : null
+        this.search.exam_id = this.$route.query.exam_id ? this.$route.query.exam_id : null
         this.loading = true
         getRecordListFromApi(this.search).then(response => {
           this.search.total = Number.parseInt(response.total)

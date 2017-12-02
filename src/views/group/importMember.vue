@@ -27,13 +27,44 @@
         </span>
       </el-dialog>
       
-      <!--展示导入信息-->
+      <!-- 展示导入信息 start-->
       <el-table :data="excelData" tooltip-effect="dark" border>
         <el-table-column label="姓名" prop="name" show-overflow-tooltip></el-table-column>
         <el-table-column label="邮箱" prop="email" show-overflow-tooltip></el-table-column>
         <el-table-column label="手机" prop="phone" show-overflow-tooltip></el-table-column>
+        <el-table-column label="操作" width="150">
+          <template slot-scope="prop">
+            <el-tooltip class="item" effect="dark" content="删除此行数据" placement="top-start">
+              <el-button icon="el-icon-delete" type="danger" size="mini" @click="deleteRow(prop.row)"></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="编辑此行数据" placement="top-start">
+              <el-button icon="el-icon-edit" type="primary" size="mini" @click="showEditRow(prop.row)"></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
       </el-table>
       <h3 style="color:red;">批量导入的用户，密码默认为 ： <el-tag type="primary">手机后六位</el-tag> </h3>
+      <!-- 展示导入信息 end-->
+      
+      <!-- 弹出层：修改用户基本信息 start -->
+      <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
+        <el-form :model="edit.data" :label-width="'120px'">
+          <el-form-item label="姓名">
+            <el-input v-model="edit.data.name" auto-complete="off" :disabled="!edit.status"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱">
+            <el-input v-model="edit.data.email" auto-complete="off" :disabled="!edit.status"></el-input>
+          </el-form-item>
+          <el-form-item label="手机">
+            <el-input v-model="edit.data.phone" auto-complete="off" :disabled="!edit.status"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer" v-show="edit.status">
+          <el-button @click="edit.show = false">取 消</el-button>
+          <el-button type="primary" @click="updateItem" :loading="edit.loading">更新</el-button>
+        </div>
+      </el-dialog>
+      <!-- 弹出层：修改用户基本信息 end -->
     </div>
   </div>
 </template>
@@ -67,6 +98,18 @@
             { name: '李四', email: 'asdas@qq.com', phone: '18812341234' },
             { name: '王五', email: '123123@qq.com', phone: '19912312312' }
           ]
+        },
+        // 编辑表单数据
+        edit: {
+          status: true,
+          row: null,
+          show: false,
+          loading: false,
+          data: {
+            name: '',
+            phone: '',
+            email: ''
+          }
         }
       }
     },
@@ -89,13 +132,13 @@
         const f = obj.files[0]
         const reader = new FileReader()
         const $t = this
-        reader.onload = function (e) {
+        reader.onload = function(e) {
           const data = e.target.result
           if ($t.rABS) {
             // 手动转化
-            $t.wb = XLSX.read(btoa(this.fixdata(data)), {type: 'base64'})
+            $t.wb = XLSX.read(btoa(this.fixdata(data)), { type: 'base64' })
           } else {
-            $t.wb = XLSX.read(data, {type: 'binary'})
+            $t.wb = XLSX.read(data, { type: 'binary' })
           }
           const json = XLSX.utils.sheet_to_json($t.wb.Sheets[$t.wb.SheetNames[0]])
           console.log(typeof json)
@@ -108,12 +151,11 @@
         }
       },
       // 此处可以解析导入数据
-      analyzeData: function (data) {
+      analyzeData: function(data) {
         return data
       },
       // 处理导入的数据
-      dealFile: function (data) {
-        console.log(data)
+      dealFile: function(data) {
         this.imFile.value = ''
         this.fullscreenLoading = false
         if (data.length <= 0) {
@@ -121,10 +163,20 @@
           this.errorMsg = '请导入正确信息'
         } else {
           this.excelData = data
+          this.$confirm('导入数据完成，是否立即进行批量注册?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.registerUsers()
+            this.$message.info('正在进行注册...')
+          }).catch((err) => {
+            console.log(err)
+          })
         }
       },
       // 文件流转BinaryString
-      fixdata: function (data) {
+      fixdata: function(data) {
         let o = ''
         let l = 0
         const w = 10240
@@ -145,13 +197,28 @@
           this.loading = true
           // 调用接口进行注册
           batchRegister(this.$route.params.groupId, this.excelData).then(() => {
-            this.$message.success('批量导入成功')
+            this.$message.success('批量注册成功')
+            this.excelData = []
+            this.$confirm('注册完成，是否立即跳转到群组成员页面?', '提示', {
+              confirmButtonText: '立即跳转',
+              cancelButtonText: '留在此页',
+              type: 'warning'
+            }).then(() => {
+              this.$router.push({
+                name: '群组成员',
+                params: {
+                  groupId: this.$route.params.groupId
+                }
+              })
+              this.$message.info('正在进行注册...')
+            }).catch((err) => {
+              console.log(err)
+            })
           }).catch(err => {
             console.log(err)
           }).finally(() => {
             this.loading = false
           })
-          
         }
       },
       // 数组去重
@@ -167,6 +234,30 @@
             return true
           }
         })
+      },
+      // 去除一行数据
+      deleteRow(row) {
+        this.excelData.forEach((item, index) => {
+          if (row.phone === item.phone) {
+            this.excelData.splice(index, 1)
+          }
+        })
+      },
+      // 展示编辑表单
+      showEditRow(row) {
+        this.edit.row = row
+        this.edit.show = true
+        this.edit.data.name = row.name
+        this.edit.data.phone = row.phone
+        this.edit.data.email = row.email
+      },
+      // 更新信息
+      updateItem() {
+        this.edit.row.name = this.edit.data.name
+        this.edit.row.email = this.edit.data.email
+        this.edit.row.phone = this.edit.data.phone
+        this.$message.success('更新成功')
+        this.edit.show = false
       }
     }
   }

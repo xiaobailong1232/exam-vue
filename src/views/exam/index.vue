@@ -25,22 +25,35 @@
     
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column label="试卷">
         <template slot-scope="prop">
-          <el-button size="mini" @click="goToPaper(prop.row.paper.id)">{{ prop.row.paper.name }}</el-button>
+          <el-tooltip class="item" effect="dark" content="查看试卷题目" placement="top-start">
+            <el-button size="mini" @click="goToPaper(prop.row.paper.id)">{{ prop.row.paper.name }}</el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column label="群组">
         <template slot-scope="prop">
-          <el-button size="mini">{{ prop.row.group.name }}</el-button>
+          <el-tooltip class="item" effect="dark" content="查看群组成员" placement="top-start">
+            <el-button size="mini" @click="goToGroup(prop.row.group.id)">{{ prop.row.group.name }}</el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间"></el-table-column>
-      <el-table-column prop="started_at" label="开考时间"></el-table-column>
-      <el-table-column prop="stopped_at" label="结考时间"></el-table-column>
       
-      <el-table-column label="操作">
+      <el-table-column label="成绩" width="80">
+        <template slot-scope="prop">
+          <el-tooltip class="item" effect="dark" content="查看答题记录" placement="top-start">
+            <el-button size="mini" type="primary" @click="goToRecord(prop.row.id)">查看</el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      
+      <el-table-column prop="started_at" label="开考时间" width="160"></el-table-column>
+      <el-table-column prop="stopped_at" label="结考时间" width="160"></el-table-column>
+      
+      <el-table-column label="操作" width="185">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
           <el-button size="mini" type="info" icon="el-icon-info" @click="showDetailForm(prop.row)"></el-button>
@@ -79,10 +92,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="开始时间">
-          <el-input v-model="form.data.started_at" auto-complete="off"></el-input>
+          <el-date-picker v-model="form.data.started_at" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item label="结束时间">
-          <el-input v-model="form.data.stopped_at" auto-complete="off"></el-input>
+          <el-date-picker v-model="form.data.stopped_at" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -109,10 +122,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="开始时间">
-          <el-input v-model="edit.data.started_at" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-date-picker v-model="edit.data.started_at" type="datetime" :disabled="!edit.status" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
         <el-form-item label="结束时间">
-          <el-input v-model="edit.data.stopped_at" auto-complete="off" :disabled="!edit.status"></el-input>
+          <el-date-picker v-model="edit.data.stopped_at" type="datetime" :disabled="!edit.status" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" v-show="edit.status">
@@ -285,8 +298,8 @@
         this.$router.push({ name: '试卷题目详情', params: { paperId}})
       },
       // Go To Group
-      goToGroup(exmaId, groupId) {
-        this.$router.push({ name: '考试群组', params: { examId: exmaId, paperId: groupId}})
+      goToGroup(groupId) {
+        this.$router.push({ name: '群组成员', params: { groupId: groupId }})
       },
       // 读取试卷信息
       getPapers() {
@@ -307,6 +320,10 @@
             console.log(err)
           }).finally(err => console.log(err))
         }
+      },
+      // 查看记录
+      goToRecord(id) {
+        this.$router.push({ name: '答题记录', query: { exam_id: id } })
       }
     }
   }
