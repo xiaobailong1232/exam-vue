@@ -272,9 +272,7 @@
         updateExamItemToApi(this.edit.row.id, this.edit.data).then(() => {
           // 原数据更新
           this.edit.row.name = this.edit.data.name
-          this.edit.row.comment = this.edit.data.comment
           this.edit.data.name = null
-          this.edit.data.comment = null
           // 隐藏表单
           this.edit.show = false
         }).catch(err => console.log(err)).finally(() => this.edit.loading = false)
