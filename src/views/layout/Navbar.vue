@@ -13,10 +13,10 @@
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
         <router-link class='inlineBlock' to="/">
           <el-dropdown-item>
-            Home
+            首页
           </el-dropdown-item>
         </router-link>
-        <el-dropdown-item divided><span @click="logout" style="display:block;">LogOut</span></el-dropdown-item>
+        <el-dropdown-item divided><span @click="logout" style="display:block;">退出登录</span></el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
   </el-menu>
@@ -43,7 +43,14 @@ export default {
       this.$store.dispatch('ToggleSideBar')
     },
     logout() {
+      const loading = this.$loading({
+        lock: true,
+        text: '正在退出中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.$store.dispatch('LogOut').then(() => {
+        loading.close()
         location.reload()  // 为了重新实例化vue-router对象 避免bug
       })
     }
