@@ -53,7 +53,16 @@
     <div class="search-bar">
       <el-form :inline="true">
         <el-form-item>
-          <el-button type="primary" @click="showAddForm" icon="el-icon-plus"></el-button>
+          <el-tooltip class="item" effect="dark" content="添加题目" placement="top-start">
+            <el-button type="primary" @click="showAddForm" icon="el-icon-plus"></el-button>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item>
+          <el-tooltip class="item" effect="dark" content="Excel导入" placement="top-start">
+            <router-link :to="{ name: '导入题目' }">
+              <el-button class="el-icon-upload"></el-button>
+            </router-link>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>

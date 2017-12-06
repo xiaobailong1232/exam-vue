@@ -97,7 +97,8 @@ export const constantRouterMap = [
     icon: 'bug',
     noDropdown: true,
     children: [
-      { path: 'index', name: '题目管理', icon: 'bug', component: _import('question/index') }
+      { path: 'index', name: '题目管理', icon: 'bug', component: _import('question/index') },
+      { path: 'import', name: '导入题目', component: _import('question/import') }
     ]
   },
   {

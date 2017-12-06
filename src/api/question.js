@@ -53,3 +53,14 @@ export function deleteQuestionItemToApi(id) {
     method: 'DELETE'
   })
 }
+
+// 批量注册
+export function batchAddQuestionsToApi(data) {
+  return fetch({
+    url: baseUriWithLine + 'batch-add',
+    method: 'POST',
+    data: {
+      questions: data
+    }
+  })
+}
