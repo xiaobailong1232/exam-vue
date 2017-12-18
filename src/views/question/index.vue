@@ -72,17 +72,28 @@
     <el-table :data="table" border style="width: 100%" v-loading="loading">
       <el-table-column type="expand">
         <template slot-scope="prop">
-          <div>
-            <el-row v-for="(item,index) in prop.row.options" :key="index" :span="24">
-              <el-col>
+          <div v-for="(item,index) in prop.row.options" :key="index">
+            <el-row>
+              <el-col :span="24">
                 <el-tag :type="item.is_answer ? 'success' : 'info'">{{ index + 1 }} . {{ item.content }}</el-tag>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <img :src="handleImage(item.image)" v-if="item.image">
               </el-col>
             </el-row>
           </div>
         </template>
       </el-table-column>
       <el-table-column prop="id" label="ID" width="50"></el-table-column>
-      <el-table-column prop="title" label="题目名称" width="500"></el-table-column>
+      <el-table-column prop="title" label="题目名称" width="300"></el-table-column>
+      <el-table-column label="图片" width="400">
+        <template slot-scope="prop">
+          <el-button size="mini" @click="imageShow = !imageShow">{{ !imageShow ? '展示' : '隐藏' }}</el-button>
+          <img :src="handleImage(prop.row.image)" v-if="imageShow && prop.row.image">
+        </template>
+      </el-table-column>
       <el-table-column label="类型" width="80">
         <template slot-scope="prop">
           <el-tag :type="parseInt(prop.row.type) === 1 ? 'info' : 'warning'">
@@ -130,6 +141,13 @@
         <el-form-item label="题目">
           <el-input v-model="form.data.title" auto-complete="off"></el-input>
         </el-form-item>
+        
+        <el-form-item label="图片补充">
+          <el-tooltip class="item" effect="dark" content="当没有图片时，您可以选择不上传" placement="top-start">
+            <qiniu-uploader ref="question" @success="handleQuestionUpload"></qiniu-uploader>
+          </el-tooltip>
+        </el-form-item>
+        
         <el-form-item label="类型">
           <el-select v-model="form.data.type" placeholder="请选择类型">
             <el-option v-for="item in questionTypeLabels" :key="item.id" :label="item.name"
@@ -145,16 +163,27 @@
         <el-form-item label="答案解析">
           <el-input v-model="form.data.comment" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item v-for="(item, index) in form.data.options" :key="index" :label="'选项' + (index + 1)">
-          <el-input v-model="form.data.options[index].content" auto-complete="off">
-            <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
-                       @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误
-            </el-button>
-            <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
-                       @click="toggleAnswer(form.data.options[index])" v-else>正确
-            </el-button>
-          </el-input>
-        </el-form-item>
+        
+        <template v-for="(item, index) in form.data.options">
+          <el-form-item :label="'选项' + (index + 1)">
+            <el-input v-model="form.data.options[index].content" auto-complete="off">
+              <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close" @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误</el-button>
+              <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check" @click="toggleAnswer(form.data.options[index])" v-else>正确</el-button>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="图片补充" v-if="index === 0">
+            <qiniu-uploader ref="optionA" @success="handleOptionUpload1"></qiniu-uploader>
+          </el-form-item>
+          <el-form-item label="图片补充" v-if="index === 1">
+            <qiniu-uploader ref="optionB" @success="handleOptionUpload2"></qiniu-uploader>
+          </el-form-item>
+          <el-form-item label="图片补充" v-if="index === 2">
+            <qiniu-uploader ref="optionC" @success="handleOptionUpload3"></qiniu-uploader>
+          </el-form-item>
+          <el-form-item label="图片补充" v-if="index === 3">
+            <qiniu-uploader ref="optionD" @success="handleOptionUpload4"></qiniu-uploader>
+          </el-form-item>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="form.show = false">取 消</el-button>
@@ -281,6 +310,8 @@
     deleteQuestionItemToApi
   } from '@/api/question'
   
+  import QiniuUploader from './qiniu'
+  
   import {
     addQuestionLabelItemToApi,
     deleteQuestionLabelItemToApi
@@ -291,6 +322,9 @@
   import { filterNullOfObject } from '@/utils/index'
   
   export default {
+    components: {
+      QiniuUploader
+    },
     created() {
       this.initFetch()
       // 读取Labels数据
@@ -332,19 +366,21 @@
         },
         labelLoading: false, // 获取标签时的loading状态
         tabPosition: '0', // 添加标签时的Tab标签页
+        imageShow: false, // 展示图片
         // 创建题目
         form: {
           show: false,
           loading: false,
           data: {
             title: null, // 标题
+            image: null, // 图片补充
             type: null, // 类型
             comment: null, // 答案解析
             options: [
-              { id: 1, content: null, is_answer: 0 },
-              { id: 2, content: null, is_answer: 0 },
-              { id: 3, content: null, is_answer: 0 },
-              { id: 4, content: null, is_answer: 0 }
+              { id: 1, content: null, is_answer: 0, image: null },
+              { id: 2, content: null, is_answer: 0, image: null },
+              { id: 3, content: null, is_answer: 0, image: null },
+              { id: 4, content: null, is_answer: 0, image: null }
             ]
           }
         },
@@ -451,7 +487,13 @@
           this.form.data.options.forEach(item => {
             item.content = null
             item.is_answer = 0
+            item.image = null
           })
+          this.$refs.question.fileList = []
+          this.$refs.optionA[0].fileList = []
+          this.$refs.optionB[0].fileList = []
+          this.$refs.optionC[0].fileList = []
+          this.$refs.optionD[0].fileList = []
         }).catch(err => console.log(err)).finally(() => this.form.loading = false)
       },
       // 详细信息
@@ -552,6 +594,26 @@
       // 转换题目正确与错误
       toggleAnswer(item) {
         item.is_answer === 0 ? item.is_answer = 1 : item.is_answer = 0
+      },
+      // 题目本身
+      handleQuestionUpload(params) {
+        this.form.data.image = params.key
+      },
+      // 题目选项
+      handleOptionUpload1(params) {
+        this.form.data.options[0].image = params.key
+      },
+      handleOptionUpload2(params) {
+        this.form.data.options[1].image = params.key
+      },
+      handleOptionUpload3(params) {
+        this.form.data.options[2].image = params.key
+      },
+      handleOptionUpload4(params) {
+        this.form.data.options[3].image = params.key
+      },
+      handleImage(name) {
+        return process.env.QINIU_URL + name + '-sf'
       }
     }
   }

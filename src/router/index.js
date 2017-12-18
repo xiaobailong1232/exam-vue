@@ -61,13 +61,13 @@ export const constantRouterMap = [
     ]
   },
   // {
-  //   path: '/role',
+  //   path: '/qiniu',
   //   component: Layout,
   //   redirect: 'noredirect',
   //   icon: 'zujian',
   //   noDropdown: true,
   //   children: [
-  //     { path: 'index', name: '角色管理', icon: 'zonghe', component: _import('role/index') }
+  //     { path: 'index', name: '上传', icon: 'zonghe', component: _import('question/qiniu') }
   //   ]
   // },
   // {
