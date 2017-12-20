@@ -101,7 +101,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="star" label="难度" width="60"></el-table-column>
+      <el-table-column prop="star_name" label="难度" width="60"></el-table-column>
       <el-table-column label="属性">
         <template slot-scope="prop">
           <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable
@@ -116,8 +116,7 @@
       <el-table-column label="操作" width="130">
         <template slot-scope="prop">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"></el-button>
-          <el-button size="mini" type="info" icon="el-icon-info" @click="showDetailForm(prop.row)"></el-button>
-          <!--<el-button size="mini" type="danger" icon="el-icon-delete" @click="delteItem(prop.row)"></el-button>-->
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="delteItem(prop.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -193,11 +192,22 @@
     <!-- 弹出层：创建题目 end -->
     
     <!-- 弹出层：展示题目详情、修改题目基本信息 start -->
-    <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
+    <el-dialog :title="edit.status ? '编辑' : '详情'" :visible="edit.show">
       <el-form :model="edit.data" :label-width="'120px'">
         <el-form-item label="题目">
           <el-input v-model="edit.data.title" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
+  
+        <el-form-item label="原图">
+          <img :src="handleImage(edit.data.image)">
+        </el-form-item>
+        
+        <el-form-item label="重新上传">
+          <el-tooltip class="item" effect="dark" content="当没有图片时，您可以选择不上传" placement="top-start">
+            <qiniu-uploader ref="editQuestion" @success="editQuestionUpload"></qiniu-uploader>
+          </el-tooltip>
+        </el-form-item>
+        
         <el-form-item label="类型">
           <el-select v-model="edit.data.type" placeholder="请选择类型" :disabled="!edit.status">
             <el-option v-for="item in questionTypeLabels" :key="item.id" :label="item.name"
@@ -207,23 +217,45 @@
         <el-form-item label="难度星级" :disabled="edit.status">
           <el-select v-model.number="edit.data.star" placeholder="请选择类型" :disabled="!edit.status">
             <el-option v-for="item in questionStarLabels" :key="item.id" :label="item.name"
-                       :value="item.name"></el-option>
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="答案解析" :disabled="!edit.status">
           <el-input v-model="edit.data.comment" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
-        
-        <el-form-item v-for="(item, index) in edit.data.options" :key="index" :label="'选项' + (index + 1)">
-          <el-input v-model="edit.data.options[index].content" auto-complete="off" :disabled="!edit.status">
-            <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
-                       @click="toggleAnswer(edit.data.options[index])" v-if="!edit.data.options[index].is_answer" :disabled="!edit.status">错误
-            </el-button>
-            <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
-                       @click="toggleAnswer(edit.data.options[index])" v-else :disabled="!edit.status">正确
-            </el-button>
-          </el-input>
-        </el-form-item>
+  
+        <template v-for="(item, index) in edit.data.options">
+          <el-form-item :label="'选项' + (index + 1)">
+            <el-input v-model="edit.data.options[index].content" auto-complete="off">
+              <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close" @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误</el-button>
+              <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check" @click="toggleAnswer(form.data.options[index])" v-else>正确</el-button>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="原图" v-if="index === 0">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;">
+          </el-form-item>
+          <el-form-item label="重新上传" v-if="index === 0">
+            <qiniu-uploader ref="editOptionA" @success="editOptionUpload1"></qiniu-uploader>
+          </el-form-item>
+          <el-form-item label="原图" v-if="index === 1">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;">
+          </el-form-item>
+          <el-form-item label="重新上传" v-if="index === 1">
+            <qiniu-uploader ref="editOptionB" @success="editOptionUpload2"></qiniu-uploader>
+          </el-form-item>
+          <el-form-item label="原图" v-if="index === 2">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;">
+          </el-form-item>
+          <el-form-item label="重新上传" v-if="index === 2">
+            <qiniu-uploader ref="editOptionC" @success="editOptionUpload3"></qiniu-uploader>
+          </el-form-item>
+          <el-form-item label="原图" v-if="index === 3">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;">
+          </el-form-item>
+          <el-form-item label="重新上传" v-if="index === 3">
+            <qiniu-uploader ref="editOptionD" @success="editOptionUpload4"></qiniu-uploader>
+          </el-form-item>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer" v-show="edit.status">
         <el-button @click="edit.show = false">取 消</el-button>
@@ -392,14 +424,15 @@
           row: null, // 保存题目信息
           data: {
             title: null, // 标题
+            image: null, // 图片补充
             type: null, // 类型
             comment: null, // 答案解析
             star: null, // 难度
             options: [
-              { id: 1, content: null, is_answer: 0 },
-              { id: 2, content: null, is_answer: 0 },
-              { id: 3, content: null, is_answer: 0 },
-              { id: 4, content: null, is_answer: 0 }
+              { id: 1, content: null, is_answer: 0, image: null },
+              { id: 2, content: null, is_answer: 0, image: null },
+              { id: 3, content: null, is_answer: 0, image: null },
+              { id: 4, content: null, is_answer: 0, image: null }
             ]
           }
         },
@@ -512,6 +545,7 @@
         this.edit.status = true
         this.edit.show = true
         this.edit.row = row
+        this.edit.data.image = row.image
         this.edit.data.title = row.title
         this.edit.data.type = row.type
         this.edit.data.star = row.star
@@ -519,12 +553,14 @@
         row.options.forEach((item, index) => {
           this.edit.data.options[index].content = item.content
           this.edit.data.options[index].is_answer = item.is_answer
+          this.edit.data.options[index].image = item.image ? item.image : null
         })
       },
       // 更新信息
       updateItem() {
         this.edit.loading = true
         updateQuestionItemToApi(this.edit.row.id, this.edit.data).then((response) => {
+          this.$notify.success('操作成功')
           // 截取
           this.table.forEach((item, key) => {
             if (this.edit.row.id === item.id) {
@@ -614,6 +650,23 @@
       },
       handleImage(name) {
         return process.env.QINIU_URL + name + '-sf'
+      },
+      // 题目本身
+      editQuestionUpload(params) {
+        this.edit.data.image = params.key
+      },
+      // 题目选项
+      editOptionUpload1(params) {
+        this.edit.data.options[0].image = params.key
+      },
+      editOptionUpload2(params) {
+        this.edit.data.options[1].image = params.key
+      },
+      editOptionUpload3(params) {
+        this.edit.data.options[2].image = params.key
+      },
+      editOptionUpload4(params) {
+        this.edit.data.options[3].image = params.key
       }
     }
   }

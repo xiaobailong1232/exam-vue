@@ -34,6 +34,7 @@ export const constantRouterMap = [
     redirect: '/user/index',
     icon: 'xinrenzhinan',
     noDropdown: true,
+    hidden: true,
     children: [
       { path: 'index', name: '用户管理', icon: 'xinrenzhinan', component: User }
     ]

@@ -83,10 +83,15 @@
         <el-table :data="question.table" border style="width: 100%" v-loading="question.loading">
           <el-table-column type="expand">
             <template slot-scope="prop">
-              <div>
-                <el-row v-for="(item,index) in prop.row.options" :key="index" :span="24">
-                  <el-col>
+              <div v-for="(item,index) in prop.row.options" :key="index">
+                <el-row>
+                  <el-col :span="24">
                     <el-tag :type="item.is_answer ? 'success' : 'info'">{{ index + 1 }} . {{ item.content }}</el-tag>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="24">
+                    <img :src="handleImage(item.image)" v-if="item.image">
                   </el-col>
                 </el-row>
               </div>
@@ -94,6 +99,12 @@
           </el-table-column>
           <el-table-column prop="id" label="ID" width="60"></el-table-column>
           <el-table-column prop="title" label="题目名称" width="500"></el-table-column>
+          <el-table-column label="图片" width="400">
+            <template slot-scope="prop">
+              <el-button size="mini" @click="imageShow = !imageShow">{{ !imageShow ? '展示' : '隐藏' }}</el-button>
+              <img :src="handleImage(prop.row.image)" v-if="imageShow && prop.row.image">
+            </template>
+          </el-table-column>
           <el-table-column label="类型" width="80">
             <template slot-scope="prop">
               <el-tag :type="parseInt(prop.row.type) === 1 ? 'info' : 'warning'">
@@ -188,6 +199,7 @@
         },
         selectedItems: [],// 存储被选中的对象信息
         updateLoading: false,// 更新Loading
+        imageShow: false
       }
     },
     methods: {
@@ -280,6 +292,9 @@
         }).finally(() => {
           this.updateLoading = false
         })
+      },
+      handleImage(name) {
+        return process.env.QINIU_URL + name + '-sf'
       }
     }
   }
