@@ -29,7 +29,7 @@
       <el-table-column prop="created_at" label="答题时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="prop">
-          <el-button size="mini" type="info" @click="getItem(prop.row.exam_id)">答题记录</el-button>
+          <el-button size="mini" type="info" @click="getItem(prop.row.id)">答题记录</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -53,8 +53,12 @@
           <div slot="header" class="clearfix">
             <span>{{ ++index }} . {{ item.question.title }}</span>
             <el-tag :type="item.is_right ? 'success' : 'danger'">{{ item.is_right ? '回答正确' : '回答错误' }}</el-tag>
+            <img :src="handleImage(item.question.image)" v-if="item.question.image" style="width: 200px">
           </div>
-          <p v-for="option in item.question.options">{{ option.id }} . {{ option.content }}</p>
+          <div v-for="option in item.question.options">
+            <el-tag :type="option.is_answer ? 'success' : 'info'">{{ option.id }} . {{ option.content }}</el-tag>
+            <img v-if="option.image"  :src="handleImage(option.image)"style="width: 200px">
+          </div>
           <el-tag type="info">用户答案: {{ item.answer }}</el-tag>
         </el-card>
       </div>
@@ -143,7 +147,10 @@
         }).finally(() => {
           this.record.loading = false
         })
-      }
+      },
+      handleImage(name) {
+        return process.env.QINIU_URL + name + '-sf'
+      },
     }
   }
 </script>
