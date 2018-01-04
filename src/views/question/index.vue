@@ -243,10 +243,10 @@
           <el-form-item :label="'选项' + (index + 1)">
             <el-input v-model="edit.data.options[index].content" auto-complete="off">
               <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
-                         @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误
+                         @click="toggleAnswer(edit.data.options[index])" v-if="!edit.data.options[index].is_answer">错误
               </el-button>
               <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
-                         @click="toggleAnswer(form.data.options[index])" v-else>正确
+                         @click="toggleAnswer(edit.data.options[index])" v-else>正确
               </el-button>
             </el-input>
           </el-form-item>
