@@ -38,7 +38,8 @@
         </el-form-item>
         <el-form-item>
           <el-select v-model="search.star" placeholder="请选择难度" filterable clearable>
-            <el-option v-for="number in 5" :key="number" :label="number" :value="number"></el-option>
+            <el-option v-for="item in questionStarLabels" :key="item.id" :label="item.name"
+                       :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -101,7 +102,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="star_name" label="难度" width="60"></el-table-column>
+      <el-table-column label="难度" prop="star" width="60"></el-table-column>
       <el-table-column label="属性">
         <template slot-scope="prop">
           <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" closable
@@ -166,8 +167,12 @@
         <template v-for="(item, index) in form.data.options">
           <el-form-item :label="'选项' + (index + 1)">
             <el-input v-model="form.data.options[index].content" auto-complete="off">
-              <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close" @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误</el-button>
-              <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check" @click="toggleAnswer(form.data.options[index])" v-else>正确</el-button>
+              <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
+                         @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误
+              </el-button>
+              <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
+                         @click="toggleAnswer(form.data.options[index])" v-else>正确
+              </el-button>
             </el-input>
           </el-form-item>
           <el-form-item label="图片补充" v-if="index === 0">
@@ -207,7 +212,7 @@
         <el-form-item label="题目">
           <el-input v-model="edit.data.title" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
-  
+        
         <el-form-item label="原图">
           <img :src="handleImage(edit.data.image)" v-if="edit.data.image">
         </el-form-item>
@@ -233,34 +238,42 @@
         <el-form-item label="答案解析" :disabled="!edit.status">
           <el-input v-model="edit.data.comment" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
-  
+        
         <template v-for="(item, index) in edit.data.options">
           <el-form-item :label="'选项' + (index + 1)">
             <el-input v-model="edit.data.options[index].content" auto-complete="off">
-              <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close" @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误</el-button>
-              <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check" @click="toggleAnswer(form.data.options[index])" v-else>正确</el-button>
+              <el-button slot="prepend" style="color: #FA5555;" icon="el-icon-close"
+                         @click="toggleAnswer(form.data.options[index])" v-if="!form.data.options[index].is_answer">错误
+              </el-button>
+              <el-button slot="prepend" style="color: #67C23A;" icon="el-icon-check"
+                         @click="toggleAnswer(form.data.options[index])" v-else>正确
+              </el-button>
             </el-input>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 0">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;" v-if="edit.data.options[index].image">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+                 v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 0">
             <qiniu-uploader ref="editOptionA" @success="editOptionUpload1"></qiniu-uploader>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 1">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"v-if="edit.data.options[index].image">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+                 v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 1">
             <qiniu-uploader ref="editOptionB" @success="editOptionUpload2"></qiniu-uploader>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 2">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"v-if="edit.data.options[index].image">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+                 v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 2">
             <qiniu-uploader ref="editOptionC" @success="editOptionUpload3"></qiniu-uploader>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 3">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"v-if="edit.data.options[index].image">
+            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+                 v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 3">
             <qiniu-uploader ref="editOptionD" @success="editOptionUpload4"></qiniu-uploader>
@@ -385,8 +398,7 @@
         'questionSectionLabels',
         'questionKnowledgeLabels',
         'questionStarLabels',
-        'questionTypeLabels',
-        'questionStarLabels'
+        'questionTypeLabels'
       ])
     },
     data() {

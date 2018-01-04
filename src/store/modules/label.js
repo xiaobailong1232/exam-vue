@@ -21,7 +21,7 @@ const label = {
     UPDATE_LIST: (state, params) => {
       state.list.forEach((item, key) => {
         if (params.id === item.id) {
-          for (let index in params.data) {
+          for (const index in params.data) {
             item[index] = params.data[index]
           }
         }
