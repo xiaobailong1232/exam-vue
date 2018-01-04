@@ -21,6 +21,7 @@
                   <el-col :span="24">
                     <el-button size="mini">{{ son.name }}</el-button>
                     <el-button type="primary" size="mini" icon="el-icon-edit" @click="updateItem(son)"></el-button>
+                    <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteItem(son)"></el-button>
                   </el-col>
                 </el-row>
               </div>
