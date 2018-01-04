@@ -355,12 +355,24 @@
           question.type = item.type
           question.star = item.star
           question.comment = item.comment
-          question.options = [
-            { id: 1, content: item[1], is_answer: item.answer === '1' ? 1 : 0 },
-            { id: 2, content: item[2], is_answer: item.answer === '1' ? 1 : 0 },
-            { id: 3, content: item[3], is_answer: item.answer === '1' ? 1 : 0 },
-            { id: 4, content: item[4], is_answer: item.answer === '1' ? 1 : 0 }
-          ]
+          if (item.answer.length > 1) {
+            // 答案为多个
+            const answers = item.answer.split('')
+            question.options = [
+              { id: 1, content: item[1], is_answer: answers.includes('1') ? 1 : 0 },
+              { id: 2, content: item[2], is_answer: answers.includes('2') ? 1 : 0 },
+              { id: 3, content: item[3], is_answer: answers.includes('3') ? 1 : 0 },
+              { id: 4, content: item[4], is_answer: answers.includes('4') ? 1 : 0 }
+            ]
+          } else {
+            // 答案为单个
+            question.options = [
+              { id: 1, content: item[1], is_answer: item.answer === '1' ? 1 : 0 },
+              { id: 2, content: item[2], is_answer: item.answer === '2' ? 1 : 0 },
+              { id: 3, content: item[3], is_answer: item.answer === '3' ? 1 : 0 },
+              { id: 4, content: item[4], is_answer: item.answer === '4' ? 1 : 0 }
+            ]
+          }
           question.labels = labels
           this.myArray.push(question)
         })
