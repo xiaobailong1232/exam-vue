@@ -122,7 +122,6 @@
             })
           }
           let json = XLSX.utils.sheet_to_json($t.wb.Sheets[$t.wb.SheetNames[0]])
-          console.log(typeof json)
           $t.dealFile($t.analyzeData(json)) // analyzeData: 解析导入数据
         }
         if (this.rABS) {
@@ -174,7 +173,6 @@
         return data
       },
       dealFile: function (data) {   // 处理导入的数据
-        console.log(data)
         this.imFile.value = ''
         this.fullscreenLoading = false
         if (data.length <= 0) {

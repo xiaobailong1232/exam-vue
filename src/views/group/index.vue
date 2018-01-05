@@ -121,17 +121,6 @@
     <!-- 弹出层：添加标签 start -->
     <el-dialog :title="label.status ? '编辑' : '详情'" :visible.sync="label.show">
       <el-form :model="label.data" :label-width="'120px'">
-        <el-form-item label="大学">
-          <el-select v-model="label.data.college" clearable filterable placeholder="请选择大学" :disabled="!label.status" :loading="labelLoading">
-            <el-option
-              v-for="item in groupCollegeLabels"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        
         <el-form-item label="专业">
           <el-select v-model="label.data.major" clearable filterable placeholder="请选择专业" :disabled="!label.status" :loading="labelLoading">
             <el-option
@@ -217,7 +206,7 @@
     created() {
       this.initFetch()
       // 读取Label标签
-      if (this.groupCollegeLabels.length === 0) {
+      if (this.groupClassLabels.length === 0) {
         this.labelLoading = true
         this.$store.dispatch('fetchLabelList').finally(() => {
           this.labelLoading = false
@@ -225,7 +214,7 @@
       }
     },
     computed: {
-      ...mapGetters(['groupCollegeLabels', 'groupClassLabels', 'groupMajorLabels'])
+      ...mapGetters(['groupClassLabels', 'groupMajorLabels'])
     },
     data() {
       const validatePassword = (rule, value, callback) => {
@@ -292,7 +281,6 @@
           loading: false,
           row: null, // 保存群组信息
           data: {
-            college: null,
             major: null,
             class: null
           }

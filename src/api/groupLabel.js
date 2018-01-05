@@ -20,7 +20,7 @@ export function getGroupLabelItemFromApi(groupId, id) {
 // 创建
 export function addGroupLabelItemToApi(groupId, data) {
   // 特殊参数处理
-  const keys = ['college', 'major', 'class']
+  const keys = ['major', 'class']
   const fields = keys.filter(item => data[item] !== null && data[item] !== undefined)
   if (fields.length > 0) {
     data.label_id = []

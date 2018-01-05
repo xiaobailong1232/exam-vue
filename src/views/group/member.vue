@@ -126,10 +126,8 @@
       },
       // 推入历史记录
       pushRoute() {
-        console.log(this.search)
         // 过滤无用参数，否则会报错
         const query = filterNullOfObject(this.search)
-        console.log(this.search)
         this.$router.push({
           path: this.$route.path,
           query: query

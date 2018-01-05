@@ -263,18 +263,20 @@
         this.edit.data.name = row.name
         this.edit.data.paper_id = row.paper_id
         this.edit.data.group_id = row.group_id
-        this.edit.data.started_at = row.started_at
-        this.edit.data.stopped_at = row.stopped_at
+        this.edit.data.started_at = new Date(Date.parse(row.started_at.replace(/-/g, '/')))
+        this.edit.data.stopped_at = new Date(Date.parse(row.stopped_at.replace(/-/g, '/')))
       },
       // 更新信息
       updateItem() {
         this.edit.loading = true
-        updateExamItemToApi(this.edit.row.id, this.edit.data).then(() => {
-          // 原数据更新
-          this.edit.row.name = this.edit.data.name
-          this.edit.data.name = null
+        updateExamItemToApi(this.edit.row.id, this.edit.data).then((response) => {
           // 隐藏表单
           this.edit.show = false
+          this.table.forEach((item, index) => {
+            if (item.id === response.data.id) {
+              this.table.splice(index, 1, response.data)
+            }
+          })
         }).catch(err => console.log(err)).finally(() => this.edit.loading = false)
       },
       // 删除
@@ -306,7 +308,7 @@
             this.papers = response.data
           }).catch(err => {
             console.log(err)
-          }).finally(err => console.log(err))
+          })
         }
       },
       // 读取群组信息
@@ -316,7 +318,7 @@
             this.groups = response.data
           }).catch(err => {
             console.log(err)
-          }).finally(err => console.log(err))
+          })
         }
       },
       // 查看记录

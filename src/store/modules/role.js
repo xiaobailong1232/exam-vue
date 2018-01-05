@@ -38,7 +38,6 @@ const role = {
     fetchRoleList({ commit }) {
       return new Promise((resolve, reject) => {
         return getRoleListFromApi().then(response => {
-          console.log(response.data);
           commit('SET_LIST', response.data)
           resolve(response)
         }).catch(err => {

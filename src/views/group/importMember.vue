@@ -141,7 +141,6 @@
             $t.wb = XLSX.read(data, { type: 'binary' })
           }
           const json = XLSX.utils.sheet_to_json($t.wb.Sheets[$t.wb.SheetNames[0]])
-          console.log(typeof json)
           $t.dealFile($t.analyzeData(json)) // analyzeData: 解析导入数据
         }
         if (this.rABS) {
@@ -226,7 +225,6 @@
         const first = data[0][key]
         console.log(data)
         return data.every((item, index) => {
-          console.log(item[key], first, index)
           if (item[key] === first && index !== 0) {
             this.$message.error(item[key] + '，重复了！')
             return false
