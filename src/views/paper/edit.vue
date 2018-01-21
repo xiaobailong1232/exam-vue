@@ -16,7 +16,10 @@
           <el-button size="mini" type="info" @click="markToQuestion(question)">{{ question.score }} 分</el-button>
         </el-col>
         <el-col :span="24" v-for="option in question.options" :key="option.id" style="margin-bottom: 5px;">
-          <el-tag :type="option.is_answer ? 'success' : 'info'">{{ String.fromCharCode(64 + option.id) }} . {{ option.content }}</el-tag>
+          <el-tag :type="option.is_answer ? 'success' : 'info'">
+            {{ String.fromCharCode(64 + option.id) }} . {{ option.content }}
+          </el-tag>
+          <img :src="option.image" v-if="option.image" style="height: 150px;">
         </el-col>
       </el-row>
     </el-card>
@@ -91,7 +94,7 @@
                 </el-row>
                 <el-row>
                   <el-col :span="24">
-                    <img :src="handleImage(item.image)" v-if="item.image">
+                    <img :src="item.image" v-if="item.image">
                   </el-col>
                 </el-row>
               </div>
@@ -102,7 +105,7 @@
           <el-table-column label="图片" width="400">
             <template slot-scope="prop">
               <el-button size="mini" @click="imageShow = !imageShow">{{ !imageShow ? '展示' : '隐藏' }}</el-button>
-              <img :src="handleImage(prop.row.image)" v-if="imageShow && prop.row.image">
+              <img :src="prop.row.image" v-if="imageShow && prop.row.image">
             </template>
           </el-table-column>
           <el-table-column label="类型" width="80">
@@ -292,9 +295,6 @@
         }).finally(() => {
           this.updateLoading = false
         })
-      },
-      handleImage(name) {
-        return process.env.QINIU_URL + name + '-sf'
       }
     }
   }

@@ -81,7 +81,7 @@
             </el-row>
             <el-row>
               <el-col :span="24">
-                <img :src="handleImage(item.image)" v-if="item.image">
+                <img :src="item.image" v-if="item.image" style="height: 150px;">
               </el-col>
             </el-row>
           </div>
@@ -92,7 +92,7 @@
       <el-table-column label="图片" width="400">
         <template slot-scope="prop">
           <el-button size="mini" @click="imageShow = !imageShow">{{ !imageShow ? '展示' : '隐藏' }}</el-button>
-          <img :src="handleImage(prop.row.image)" v-if="imageShow && prop.row.image">
+          <img :src="prop.row.image" v-if="imageShow && prop.row.image" style="height: 150px;">
         </template>
       </el-table-column>
       <el-table-column label="类型" width="80">
@@ -214,7 +214,7 @@
         </el-form-item>
         
         <el-form-item label="原图">
-          <img :src="handleImage(edit.data.image)" v-if="edit.data.image">
+          <img :src="edit.data.image" v-if="edit.data.image">
         </el-form-item>
         
         <el-form-item label="重新上传">
@@ -251,28 +251,28 @@
             </el-input>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 0">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+            <img :src="edit.data.options[index].image" style="width: 200px;"
                  v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 0">
             <qiniu-uploader ref="editOptionA" @success="editOptionUpload1"></qiniu-uploader>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 1">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+            <img :src="edit.data.options[index].image" style="width: 200px;"
                  v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 1">
             <qiniu-uploader ref="editOptionB" @success="editOptionUpload2"></qiniu-uploader>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 2">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+            <img :src="edit.data.options[index].image" style="width: 200px;"
                  v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 2">
             <qiniu-uploader ref="editOptionC" @success="editOptionUpload3"></qiniu-uploader>
           </el-form-item>
           <el-form-item label="原图" v-if="index === 3">
-            <img :src="handleImage(edit.data.options[index].image)" style="width: 200px;"
+            <img :src="edit.data.options[index].image" style="width: 200px;"
                  v-if="edit.data.options[index].image">
           </el-form-item>
           <el-form-item label="重新上传" v-if="index === 3">
@@ -669,9 +669,6 @@
       },
       handleOptionUpload4(params) {
         this.form.data.options[3].image = params.key
-      },
-      handleImage(name) {
-        return process.env.QINIU_URL + name + '-sf'
       },
       // 题目本身
       editQuestionUpload(params) {

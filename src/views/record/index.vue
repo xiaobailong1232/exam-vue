@@ -48,18 +48,25 @@
     <!-- 分页 end -->
     
     <el-dialog title="详情" :visible.sync="record.show" width="80%" v-loading="record.loading" >
+      <el-card class="box-card" style="margin-bottom: 5px;">
+        <el-row>
+          <el-col :span="24">总分：{{ record.info.total_score }}</el-col>
+          <el-col :span="24">实际得分：{{ record.info.actual_score }}</el-col>
+          <el-col :span="24">答题时间：{{ record.info.created_at }}</el-col>
+        </el-row>
+      </el-card>
       <div v-for="(item, index) in record.data" :key="item.id">
         <el-card class="box-card" style="margin-bottom: 5px;">
           <div slot="header" class="clearfix">
-            <span>{{ ++index }} . {{ item.question.title }}</span>
+            <span>{{ ++index }} . {{ item.title }}</span>
             <el-tag :type="item.is_right ? 'success' : 'danger'">{{ item.is_right ? '回答正确' : '回答错误' }}</el-tag>
-            <img :src="handleImage(item.question.image)" v-if="item.question.image" style="width: 200px">
+            <img :src="item.question.image" v-if="item.image" style="width: 150px">
           </div>
-          <div v-for="option in item.question.options">
-            <el-tag :type="option.is_answer ? 'success' : 'info'">{{ option.id }} . {{ option.content }}</el-tag>
-            <img v-if="option.image"  :src="handleImage(option.image)"style="width: 200px">
+          <div v-for="option in item.options">
+            <el-tag :type="option.is_answer ? 'success' : 'info'">{{ option.letter }} . {{ option.content }}</el-tag>
+            <img v-if="option.image"  :src="option.image"style="width: 150px">
           </div>
-          <el-tag type="info">用户答案: {{ item.answer }}</el-tag>
+          <el-tag type="info">用户答案: {{ item.my_answers }}</el-tag>
         </el-card>
       </div>
     </el-dialog>
@@ -94,7 +101,8 @@
         record: {
           loading: false,
           show: false,
-          data: {}
+          data: {},
+          info: {}
         }
       }
     },
@@ -141,16 +149,14 @@
         this.record.loading = true
         this.record.show = true
         getRecordItemFromApi(exam_id).then(response => {
-          this.record.data = response.data
+          this.record.data = response.data.paper.questions
+          this.record.info = response.data.record
         }).catch(err => {
           console.log(err)
         }).finally(() => {
           this.record.loading = false
         })
-      },
-      handleImage(name) {
-        return process.env.QINIU_URL + name + '-sf'
-      },
+      }
     }
   }
 </script>
