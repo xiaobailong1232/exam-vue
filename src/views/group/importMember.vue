@@ -15,8 +15,9 @@
           <el-table-column property="name" label="name"></el-table-column>
           <el-table-column property="phone" label="phone"></el-table-column>
           <el-table-column property="email" label="email"></el-table-column>
+          <el-table-column property="student_id" label="student_id"></el-table-column>
         </el-table>
-        <el-tag type="danger">表头请使用英文：name、phone、email</el-tag>
+        <el-tag type="danger">表头请使用英文：name、phone、student_id、email</el-tag>
       </el-dialog>
       
       <!--错误信息提示-->
@@ -32,6 +33,7 @@
         <el-table-column label="姓名" prop="name" show-overflow-tooltip></el-table-column>
         <el-table-column label="邮箱" prop="email" show-overflow-tooltip></el-table-column>
         <el-table-column label="手机" prop="phone" show-overflow-tooltip></el-table-column>
+        <el-table-column label="学号" prop="student_id" show-overflow-tooltip></el-table-column>
         <el-table-column label="操作" width="150">
           <template slot-scope="prop">
             <el-tooltip class="item" effect="dark" content="删除此行数据" placement="top-start">
@@ -43,7 +45,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <h3 style="color:red;">批量导入的用户，密码默认为 ： <el-tag type="primary">手机后六位</el-tag> </h3>
+      <h3 style="color:red;">批量导入的用户，密码默认为 ： <el-tag type="primary">123456</el-tag> </h3>
       <!-- 展示导入信息 end-->
       
       <!-- 弹出层：修改用户基本信息 start -->
@@ -57,6 +59,9 @@
           </el-form-item>
           <el-form-item label="手机">
             <el-input v-model="edit.data.phone" auto-complete="off" :disabled="!edit.status"></el-input>
+          </el-form-item>
+          <el-form-item label="学号">
+            <el-input v-model="edit.data.student_id" auto-complete="off" :disabled="!edit.status"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer" v-show="edit.status">
@@ -94,9 +99,9 @@
         example: {
           show: false,
           data: [
-            { name: '张三', email: '11231231@qq.com', phone: '13812341234' },
-            { name: '李四', email: 'asdas@qq.com', phone: '18812341234' },
-            { name: '王五', email: '123123@qq.com', phone: '19912312312' }
+            { name: '张三', email: '11231231@qq.com', phone: '13812341234', student_id: '110430042' },
+            { name: '李四', email: 'asdas@qq.com', phone: '18812341234', student_id: '110430043' },
+            { name: '王五', email: '123123@qq.com', phone: '19912312312', student_id: '110430044' }
           ]
         },
         // 编辑表单数据
@@ -108,7 +113,8 @@
           data: {
             name: '',
             phone: '',
-            email: ''
+            email: '',
+            student_id: ''
           }
         }
       }
