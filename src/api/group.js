@@ -35,10 +35,13 @@ export function updateGroupItemToApi(id, data) {
   })
 }
 // 删除
-export function deleteGroupItemToApi(id) {
+export function deleteGroupItemToApi(id, force = 0) {
   return fetch({
     url: baseUriWithLine + id,
-    method: 'DELETE'
+    method: 'DELETE',
+    data: {
+      force: force
+    }
   })
 }
 // 恢复

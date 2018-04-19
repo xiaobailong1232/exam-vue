@@ -52,17 +52,17 @@
       </el-table-column>
       
       <el-table-column label="状态" width="80">
-        <template slot-scope="prop">
-          <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
-            <el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
-            <el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>
-          </el-tooltip>
-        </template>
-      </el-table-column>
+      <template slot-scope="prop">
+        <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
+          <el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
+          <el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>
+        </el-tooltip>
+      </template>
+    </el-table-column>
       
-      <el-table-column label="操作" width="190">
+      <el-table-column label="操作" width="250">
         <template slot-scope="prop">
           <el-tooltip class="item" effect="dark" content="编辑信息" placement="top">
             <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditForm(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
@@ -72,6 +72,9 @@
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="Excel导入学员" placement="top">
             <el-button size="mini" type="info" icon="el-icon-upload" @click="goToImport(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteItemForce(prop.row)"  v-if="!prop.row.deleted_at"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -107,7 +110,7 @@
     <!-- 弹出层：修改群组基本信息 start -->
     <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
       <el-form :model="edit.data" :label-width="'120px'">
-        <el-form-item label="Name">
+        <el-form-item label="名称">
           <el-input v-model="edit.data.name" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
       </el-form>
@@ -434,6 +437,21 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => deleteGroupItemToApi(row.id)).then(response => {
+          row.deleted_at = true
+        }).catch(err => console.log(err))
+      },
+      // 删除
+      deleteItemForce(row) {
+        this.$confirm(`此操作将删除『${row.name}』群组, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => deleteGroupItemToApi(row.id, 1)).then(response => {
+          this.table.forEach((item, index) => {
+            if (item.id === row.id) {
+              this.table.splice(index, 1)
+            }
+          })
           row.deleted_at = true
         }).catch(err => console.log(err))
       },

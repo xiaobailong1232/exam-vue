@@ -14,6 +14,9 @@
           <span style="font-weight: bold">{{ (index + 1) }}</span> . {{ question.title }}
           <el-button size="mini" type="danger" @click="removeQuestionFromPaper(question.id)">移除</el-button>
           <el-button size="mini" type="info" @click="markToQuestion(question)">{{ question.score }} 分</el-button>
+          <el-button size="mini" type="info">难度：{{ question.star }}</el-button>
+          <el-button size="mini" type="primary" @click="moveUp(index)">上移</el-button>
+          <el-button size="mini" type="primary" @click="moveDown(index)">下移</el-button>
         </el-col>
         <el-col :span="24" v-for="option in question.options" :key="option.id" style="margin-bottom: 5px;">
           <el-tag :type="option.is_answer ? 'success' : 'info'">
@@ -115,11 +118,11 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="属性">
-            <template slot-scope="prop">
-              <el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" type="primary">{{item.name}}</el-tag>
-            </template>
-          </el-table-column>
+          <!--<el-table-column label="属性">-->
+            <!--<template slot-scope="prop">-->
+              <!--<el-tag v-if="prop.row.labels.length > 0" v-for="item in prop.row.labels" :key="item.id" type="primary">{{item.name}}</el-tag>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
           <el-table-column label="操作">
             <template slot-scope="prop">
               <el-button size="mini" type="danger" @click="removeQuestionFromPaper(prop.row.id)" v-if="isSelected(prop.row.id)">从试卷移除</el-button>
@@ -213,7 +216,7 @@
           this.paper.item = response.data
           // 数据转换
           response.data.questions.forEach(item => {
-            const row = { id: item.id, title: item.title, options: item.options, score: item.pivot.score}
+            const row = { id: item.id, title: item.title, options: item.options, score: item.pivot.score, star: item.star}
             this.selectedItems.push(row)
           })
         }).catch(err => {
@@ -295,6 +298,25 @@
         }).finally(() => {
           this.updateLoading = false
         })
+      },
+      // 试卷题目上移
+      moveUp(index) {
+        if (index === 0) {
+          return false
+        }
+        const current = this.selectedItems[index]
+        const prev = this.selectedItems[index - 1]
+        this.selectedItems.splice(index, 1, prev)
+        this.selectedItems.splice(index - 1, 1, current)
+      },
+      moveDown(index) {
+        if (index === (this.selectedItems.length - 1)) {
+          return false
+        }
+        const current = this.selectedItems[index]
+        const next = this.selectedItems[index + 1]
+        this.selectedItems.splice(index, 1, next)
+        this.selectedItems.splice(index + 1, 1, current)
       }
     }
   }

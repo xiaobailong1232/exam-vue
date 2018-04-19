@@ -78,7 +78,7 @@
     <!-- 弹出层：修改菜单基本信息 start -->
     <el-dialog :title="edit.status ? '编辑' : '详情'" :visible.sync="edit.show">
       <el-form :model="edit.data" :label-width="'120px'">
-        <el-form-item label="Name">
+        <el-form-item label="名称">
           <el-input v-model="edit.data.name" auto-complete="off" :disabled="!edit.status"></el-input>
         </el-form-item>
         <el-form-item label="等级">

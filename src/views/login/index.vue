@@ -1,7 +1,10 @@
 <template>
   <div class="login-container">
+    
     <el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px"
       class="card-box login-form">
+      <img src="http://on64ewxzt.bkt.clouddn.com/%E5%9B%BE%E4%B8%89%EF%BC%88%E9%80%8F%E6%98%8E%E5%BA%95%EF%BC%89.PNG"
+             style="background: aliceblue; position: relative;display: block;width: 290px;height: 120px;margin: 0 0 20px 20px;" />
       <h3 class="title">考 评 系 统</h3>
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
@@ -122,7 +125,6 @@ export default {
     }
     .title {
       font-size: 26px;
-      font-weight: 400;
       color: $light_gray;
       margin: 0px auto 40px auto;
       text-align: center;

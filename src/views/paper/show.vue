@@ -14,6 +14,7 @@
         </el-col>
         <el-col :span="24" v-for="option in question.options" :key="option.id" style="margin-bottom: 5px;">
           <el-tag :type="option.is_answer ? 'success' : 'info'">{{ String.fromCharCode(64 + option.id) }} . {{ option.content }}</el-tag>
+          <img :src="option.image" v-if="option.image" style="height: 100px;">
         </el-col>
       </el-row>
     </el-card>
