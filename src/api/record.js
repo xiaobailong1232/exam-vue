@@ -45,3 +45,27 @@ export function deleteRecordItemToApi(id) {
     method: 'DELETE'
   })
 }
+
+// 获取考试成绩
+export function getExamRecordFromApi(exam) {
+  return fetch({
+    url: 'stats/exam/' + exam,
+    method: 'GET'
+  })
+}
+
+// 获取学员成绩
+export function getUserRecordFromApi(user) {
+  return fetch({
+    url: 'stats/user/' + user,
+    method: 'GET'
+  })
+}
+
+// 获取学员成绩
+export function getStatExamQuestionFromApi(exam) {
+  return fetch({
+    url: 'stats/exam-question/' + exam,
+    method: 'GET'
+  })
+}

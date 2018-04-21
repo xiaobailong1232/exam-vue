@@ -19,10 +19,14 @@
     <!-- 主要表格 start -->
     <el-table :data="table" border style="width: 100%" v-loading="loading">
       <el-table-column label="考试名称">
-        <template slot-scope="prop">{{ prop.row.exam.name }}</template>
+        <template slot-scope="prop">
+          <el-button size="mini" type="info" @click="getExamRecordStat(prop.row.exam_id)">{{ prop.row.exam.name }}</el-button>
+        </template>
       </el-table-column>
       <el-table-column label="学员姓名">
-        <template slot-scope="prop">{{ prop.row.user.name }}</template>
+        <template slot-scope="prop">
+          <el-button size="mini" type="info" @click="getUserRecordStat(prop.row.user_id)">{{ prop.row.user.name }}</el-button>
+        </template>
       </el-table-column>
       <el-table-column prop="total_score" label="卷面分"></el-table-column>
       <el-table-column prop="actual_score" label="成绩"></el-table-column>
@@ -30,6 +34,7 @@
       <el-table-column label="操作">
         <template slot-scope="prop">
           <el-button size="mini" type="info" @click="getItem(prop.row.id)">答题记录</el-button>
+          <el-button size="mini" type="info" @click="getStatExamQuestion(prop.row.exam_id)">考试错题统计</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,13 +75,52 @@
         </el-card>
       </div>
     </el-dialog>
+  
+    <el-dialog title="本次考试成绩统计" :visible.sync="recordExam.show" width="80%">
+      <el-table :data="recordExam.data" border style="width: 100%" v-loading="recordExam.loading">
+        <el-table-column label="考试名称" prop="exam.name"></el-table-column>
+        <el-table-column label="学员姓名" prop="user.name"></el-table-column>
+        <el-table-column prop="total_score" label="卷面分"></el-table-column>
+        <el-table-column prop="actual_score" label="成绩"></el-table-column>
+        <el-table-column prop="created_at" label="答题时间"></el-table-column>
+      </el-table>
+    </el-dialog>
+  
+    <el-dialog title="学员考试成绩统计" :visible.sync="recordUser.show" width="80%">
+      <el-table :data="recordUser.data" border style="width: 100%" v-loading="recordUser.loading">
+        <el-table-column label="考试名称" prop="exam.name"></el-table-column>
+        <el-table-column label="学员姓名" prop="user.name"></el-table-column>
+        <el-table-column prop="total_score" label="卷面分"></el-table-column>
+        <el-table-column prop="actual_score" label="成绩"></el-table-column>
+        <el-table-column prop="created_at" label="答题时间"></el-table-column>
+      </el-table>
+    </el-dialog>
+    
+    <el-dialog title="错题考试统计" :visible.sync="recordExamQuestion.show" width="80%">
+      <el-table :data="recordExamQuestion.data" border style="width: 100%" v-loading="recordExamQuestion.loading">
+        <el-table-column prop="question.title" label="题目"></el-table-column>
+        <el-table-column prop="error_count" label="错题次数" width="100"></el-table-column>
+        <el-table-column prop="right_count" label="正确次数" width="100"></el-table-column>
+        <el-table-column prop="record_count" label="答题次数" width="100"></el-table-column>
+        <el-table-column prop="error_rate" label="错误率" width="100">
+          <template slot-scope="prop">
+            <el-tag size="mini" type="danger" v-if="prop.row.error_rate >= 50">{{ prop.row.error_rate + '%'}}</el-tag>
+            <el-tag size="mini" type="warning" v-else-if="prop.row.error_rate >=20 && prop.row.error_rate < 50">{{ prop.row.error_rate + '%' }}</el-tag>
+            <el-tag size="mini" type="success" v-else>{{ prop.row.error_rate + '%' }}</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {
     getRecordListFromApi,
-    getRecordItemFromApi
+    getRecordItemFromApi,
+    getExamRecordFromApi,
+    getUserRecordFromApi,
+    getStatExamQuestionFromApi
   } from '@/api/record'
   
   import { filterNullOfObject } from '@/utils/index'
@@ -103,6 +147,21 @@
           show: false,
           data: {},
           info: {}
+        },
+        recordExam: {
+          loading: false,
+          show: false,
+          data: []
+        },
+        recordUser: {
+          loading: false,
+          show: false,
+          data: []
+        },
+        recordExamQuestion: {
+          loading: false,
+          show: false,
+          data: []
         }
       }
     },
@@ -155,6 +214,42 @@
           console.log(err)
         }).finally(() => {
           this.record.loading = false
+        })
+      },
+      // 考试成绩
+      getExamRecordStat(exam) {
+        this.recordExam.show = true
+        this.recordExam.loading = true
+        getExamRecordFromApi(exam).then(response => {
+          this.recordExam.data = response.data
+        }).catch(err => {
+          console.log(err)
+        }).finally(() => {
+          this.recordExam.loading = false
+        })
+      },
+      // 学员成绩
+      getUserRecordStat(user) {
+        this.recordUser.show = true
+        this.recordUser.loading = true
+        getUserRecordFromApi(user).then(response => {
+          this.recordUser.data = response.data
+        }).catch(err => {
+          console.log(err)
+        }).finally(() => {
+          this.recordUser.loading = false
+        })
+      },
+      // 考试错题统计
+      getStatExamQuestion(exam) {
+        this.recordExamQuestion.show = true
+        this.recordExamQuestion.loading = true
+        getStatExamQuestionFromApi(exam).then(response => {
+          this.recordExamQuestion.data = response.data
+        }).catch(err => {
+          console.log(err)
+        }).finally(() => {
+          this.recordExamQuestion.loading = false
         })
       }
     }
