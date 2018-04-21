@@ -165,6 +165,9 @@
         <el-form-item label="手机" prop="phone">
           <el-input v-model="member.data.phone" auto-complete="off"></el-input>
         </el-form-item>
+        <el-form-item label="学号" prop="student_id">
+          <el-input v-model="member.data.student_id" auto-complete="off"></el-input>
+        </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input type="password" v-model="member.data.password" auto-complete="off"></el-input>
         </el-form-item>
@@ -239,10 +242,17 @@
         }
       }
       const validatePhone = (rule, value, callback) => {
-        if (value === '' || value === undefined) {
-          callback(new Error('请输入手机'))
-        } else if (!isPhone(value)) {
+        if (!this.member.data.student_id && !value) {
+          callback(new Error('学号 与 手机必选其一'))
+        } else if (value && !isPhone(value)) {
           callback(new Error('手机不合法!'))
+        } else {
+          callback()
+        }
+      }
+      const validateStudentId = (rule, value, callback) => {
+        if (!this.member.data.phone && !value) {
+          callback(new Error('学号 与 手机必选其一'))
         } else {
           callback()
         }
@@ -305,8 +315,10 @@
               { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
             ],
             phone: [
-              { required: true, message: '请输入手机', trigger: 'blur' },
               { validator: validatePhone, trigger: 'blur' }
+            ],
+            student_id: [
+              { validator: validateStudentId, trigger: 'blur' }
             ],
             email: [
               { required: true, message: '请输入邮箱', trigger: 'blur' },
