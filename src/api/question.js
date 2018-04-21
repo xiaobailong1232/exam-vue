@@ -64,3 +64,18 @@ export function batchAddQuestionsToApi(data) {
     }
   })
 }
+
+// 批量注册
+export function batchDeleteQuestionsToApi(data) {
+  const ids = []
+  data.forEach((item) => {
+    ids.push(item.id)
+  })
+  return fetch({
+    url: baseUriWithLine + 'batch-delete',
+    method: 'DELETE',
+    data: {
+      ids: ids
+    }
+  })
+}

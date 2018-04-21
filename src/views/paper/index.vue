@@ -18,6 +18,8 @@
       <el-form :inline="true">
         <el-form-item>
           <el-button type="primary" @click="showAddForm" icon="el-icon-plus"></el-button>
+          <el-button type="primary" @click="showRecycle(1)" v-if="!search.trash">显示回收站</el-button>
+          <el-button type="primary" @click="showRecycle(0)" v-else>隐藏回收站</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -31,11 +33,11 @@
       <el-table-column prop="created_at" label="创建时间" width="160"></el-table-column>
       <el-table-column label="状态" width="90">
         <template slot-scope="prop">
-          <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
-            <el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>
+          <el-tooltip class="item" effect="dark" content="点击即可恢复" placement="top" v-if="prop.row.deleted_at">
+            <el-button size="mini" type="success" @click="restoreItem(prop.row)">恢复</el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
-            <el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>
+          <el-tooltip class="item" effect="dark" content="点击即可删除" placement="top" v-else>
+            <el-button size="mini" type="danger" @click="deleteItem(prop.row)">删除</el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -150,7 +152,8 @@
           page: 1,
           size: 10,
           total: 0,
-          name: null
+          name: null,
+          trash: 0
         },
         labelLoading: false, // 获取标签时的啊loading状态
         // 创建试卷
@@ -205,6 +208,7 @@
         this.search.page = this.$route.query.page ? Number.parseInt(this.$route.query.page) : 1
         this.search.size = this.$route.query.size ? parseInt(this.$route.query.size) : 10
         this.search.name = this.$route.query.name ? this.$route.query.name : null
+        this.search.trash = this.$route.query.trash ? this.$route.query.trash : 0
         this.loading = true
         getPaperListFromApi(this.search).then(response => {
           this.search.total = Number.parseInt(response.total)
@@ -302,6 +306,11 @@
       // 进入编辑页面
       goToShow(paperId) {
         this.$router.push({ name: '试卷题目详情', params: { paperId } })
+      },
+      // 展示回收站
+      showRecycle(bool) {
+        this.search.trash = bool
+        this.handleSearch()
       }
     }
   }

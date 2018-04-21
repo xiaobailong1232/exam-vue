@@ -59,33 +59,41 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item>
-          <el-tooltip class="item" effect="dark" content="Excel导入" placement="top-start">
-            <router-link :to="{ name: '导入题目' }">
-              <el-button class="el-icon-upload"></el-button>
-            </router-link>
-          </el-tooltip>
+        <el-tooltip class="item" effect="dark" content="Excel导入" placement="top-start">
+          <router-link :to="{ name: '导入题目' }">
+            <el-button class="el-icon-upload"></el-button>
+          </router-link>
+        </el-tooltip>
+      </el-form-item>
+        <el-form-item>
+            <el-button @click="bacthDeleteToApi" :loading="batchDeleteLoading">批量删除</el-button>
         </el-form-item>
       </el-form>
     </div>
     <!-- 操作按钮 start -->
     
     <!-- 主要表格 start -->
-    <el-table :data="table" border style="width: 100%" v-loading="loading">
+    <el-table :data="table" border style="width: 100%" v-loading="loading"
+              @selection-change="handleSelectionChange">
       <el-table-column type="expand">
-        <template slot-scope="prop">
-          <div v-for="(item,index) in prop.row.options" :key="index">
-            <el-row>
-              <el-col :span="24">
-                <el-tag :type="item.is_answer ? 'success' : 'info'">{{ index + 1 }} . {{ item.content }}</el-tag>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <img :src="item.image" v-if="item.image" style="height: 150px;">
-              </el-col>
-            </el-row>
-          </div>
-        </template>
+      <template slot-scope="prop">
+        <div v-for="(item,index) in prop.row.options" :key="index">
+          <el-row>
+            <el-col :span="24">
+              <el-tag :type="item.is_answer ? 'success' : 'info'">{{ index + 1 }} . {{ item.content }}</el-tag>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24">
+              <img :src="item.image" v-if="item.image" style="height: 150px;">
+            </el-col>
+          </el-row>
+        </div>
+      </template>
+    </el-table-column>
+      <el-table-column
+        type="selection"
+        width="55">
       </el-table-column>
       <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="title" label="题目名称" width="300"></el-table-column>
@@ -362,7 +370,8 @@
     getQuestionListFromApi,
     addQuestionItemToApi,
     updateQuestionItemToApi,
-    deleteQuestionItemToApi
+    deleteQuestionItemToApi,
+    batchDeleteQuestionsToApi
   } from '@/api/question'
   
   import QiniuUploader from './qiniu'
@@ -478,7 +487,10 @@
           data: {
             label_id: null
           }
-        }
+        },
+        // 多选
+        multipleSelection: [],
+        batchDeleteLoading: false
       }
     },
     methods: {
@@ -686,6 +698,20 @@
       },
       editOptionUpload4(params) {
         this.edit.data.options[3].image = params.key
+      },
+      // 多选
+      handleSelectionChange(val) {
+        console.log(val)
+        this.multipleSelection = val
+      },
+      // 批量删除
+      bacthDeleteToApi() {
+        this.batchDeleteLoading = true
+        batchDeleteQuestionsToApi(this.multipleSelection).then(response => {
+          this.$router.go()
+        }).catch(err => console.log(err)).finally(() => {
+          this.batchDeleteLoading = false
+        })
       }
     }
   }
