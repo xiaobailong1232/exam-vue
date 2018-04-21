@@ -51,16 +51,16 @@
         </template>
       </el-table-column>
       
-      <el-table-column label="状态" width="80">
-      <template slot-scope="prop">
-        <el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">
-          <el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>
-        </el-tooltip>
-        <el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>
-          <el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>
-        </el-tooltip>
-      </template>
-    </el-table-column>
+      <!--<el-table-column label="状态" width="80">-->
+        <!--<template slot-scope="prop">-->
+          <!--<el-tooltip class="item" effect="dark" content="点击即可启用" placement="top" v-if="prop.row.deleted_at">-->
+            <!--<el-button size="mini" type="danger" @click="restoreItem(prop.row)">禁用</el-button>-->
+          <!--</el-tooltip>-->
+          <!--<el-tooltip class="item" effect="dark" content="点击即可禁用" placement="top" v-else>-->
+            <!--<el-button size="mini" type="success" @click="deleteItem(prop.row)">启用</el-button>-->
+          <!--</el-tooltip>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       
       <el-table-column label="操作" width="250">
         <template slot-scope="prop">
